@@ -1,0 +1,523 @@
+@import "tailwindcss";
+@plugin './hero.js';
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+    h1 {
+        @apply text-xl font-bold;
+    }
+
+    button {
+        @apply cursor-pointer;
+    }
+    
+    /* Global theme transitions */
+    * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    /* Custom scrollbar for the theme */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #F5F5F5;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #8B0000;
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #DC143C;
+    }
+    
+    /* Dark mode scrollbar */
+    .dark ::-webkit-scrollbar-track {
+        background: #1A1A1A;
+    }
+    
+    .dark ::-webkit-scrollbar-thumb {
+        background: #FF6B6B;
+    }
+    
+    .dark ::-webkit-scrollbar-thumb:hover {
+        background: #FF8E8E;
+    }
+    
+    /* Smooth animations for decorative elements */
+    .floating-shape {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    /* Glass morphism effect */
+    .glass-effect {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    /* Custom input focus styles for HeroUI */
+    .custom-input-wrapper {
+        border: 2px solid rgba(139, 0, 0, 0.2) !important;
+        background-color: white !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .custom-input-wrapper:hover {
+        border-color: rgba(139, 0, 0, 0.4) !important;
+    }
+    
+    .custom-input-wrapper:focus-within {
+        border-color: rgba(139, 0, 0, 0.8) !important;
+        box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1) !important;
+    }
+    
+    .custom-input-wrapper.is-invalid {
+        border-color: rgba(239, 68, 68, 0.6) !important;
+    }
+    
+    .custom-input-wrapper.is-invalid:hover {
+        border-color: rgba(239, 68, 68, 0.8) !important;
+    }
+    
+    .custom-input-wrapper.is-invalid:focus-within {
+        border-color: rgba(239, 68, 68, 1) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+    }
+    
+    /* Dark mode input styles */
+    .dark .custom-input-wrapper {
+        border: 2px solid rgba(255, 107, 107, 0.3) !important;
+        background-color: #2D2D2D !important;
+    }
+    
+    .dark .custom-input-wrapper:hover {
+        border-color: rgba(255, 107, 107, 0.5) !important;
+    }
+    
+    .dark .custom-input-wrapper:focus-within {
+        border-color: rgba(255, 107, 107, 0.8) !important;
+        box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2) !important;
+    }
+    
+    /* Custom select focus styles */
+    .custom-select-trigger {
+        border: 2px solid rgba(139, 0, 0, 0.2) !important;
+        background-color: white !important;
+        transition: all 0.3s ease !important;
+        color: #1A1A1A !important;
+    }
+    
+    .custom-select-trigger:hover {
+        border-color: rgba(139, 0, 0, 0.4) !important;
+    }
+    
+    .custom-select-trigger:focus {
+        border-color: rgba(139, 0, 0, 0.8) !important;
+        box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1) !important;
+    }
+    
+    /* Dark mode select styles */
+    .dark .custom-select-trigger {
+        border: 2px solid rgba(255, 107, 107, 0.3) !important;
+        background-color: #2D2D2D !important;
+        color: #FFFFFF !important;
+    }
+    
+    .dark .custom-select-trigger:hover {
+        border-color: rgba(255, 107, 107, 0.5) !important;
+    }
+    
+    .dark .custom-select-trigger:focus {
+        border-color: rgba(255, 107, 107, 0.8) !important;
+        box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2) !important;
+    }
+    
+    /* Custom select listbox styles */
+    .custom-select-listbox {
+        background-color: white !important;
+        border: 2px solid rgba(139, 0, 0, 0.2) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .custom-select-item {
+        color: #1A1A1A !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .custom-select-item:hover {
+        background-color: rgba(139, 0, 0, 0.1) !important;
+        color: #8B0000 !important;
+    }
+    
+    .custom-select-item[data-selected="true"] {
+        background-color: rgba(139, 0, 0, 0.15) !important;
+        color: #8B0000 !important;
+    }
+    
+    /* Dark mode select listbox styles */
+    .dark .custom-select-listbox {
+        background-color: #2D2D2D !important;
+        border: 2px solid rgba(255, 107, 107, 0.3) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .dark .custom-select-item {
+        color: #FFFFFF !important;
+    }
+    
+    .dark .custom-select-item:hover {
+        background-color: rgba(255, 107, 107, 0.2) !important;
+        color: #FF6B6B !important;
+    }
+    
+    .dark .custom-select-item[data-selected="true"] {
+        background-color: rgba(255, 107, 107, 0.25) !important;
+        color: #FF6B6B !important;
+    }
+    
+    /* Custom input placeholder styles */
+    .custom-input:focus::placeholder {
+        color: rgba(139, 0, 0, 0.6) !important;
+    }
+    
+    .dark .custom-input:focus::placeholder {
+        color: rgba(255, 107, 107, 0.6) !important;
+    }
+    
+    /* Navbar hover effects */
+    .navbar-logo-hover {
+        transition: all 0.3s ease !important;
+    }
+    
+    .navbar-logo-hover:hover {
+        transform: scale(1.05) !important;
+    }
+    
+    .navbar-logo-container-hover:hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .navbar-profile-hover {
+        transition: all 0.3s ease !important;
+    }
+    
+    .navbar-profile-hover:hover {
+        transform: scale(1.05) !important;
+    }
+    
+    .navbar-profile-bg-hover {
+        transition: opacity 0.3s ease !important;
+        opacity: 0 !important;
+    }
+    
+    .navbar-profile-hover:hover .navbar-profile-bg-hover {
+        opacity: 1 !important;
+    }
+    
+    .navbar-button-hover {
+        transition: all 0.3s ease !important;
+    }
+    
+    .navbar-button-hover:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* Enhanced loading animations */
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+    
+    .animate-ping {
+        animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    
+    .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .animate-bounce {
+        animation: bounce 1s infinite;
+    }
+    
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    @keyframes ping {
+        75%, 100% {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(-25%);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+        }
+        50% {
+            transform: none;
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        }
+    }
+    
+    /* Dark mode specific styles */
+    .dark {
+        color-scheme: dark;
+    }
+    
+    .dark body {
+        background-color: #1A1A1A;
+        color: #FFFFFF;
+    }
+    
+    /* Dark mode card styles */
+    .dark .bg-white {
+        background-color: #2D2D2D !important;
+    }
+    
+    .dark .border-gray-100,
+    .dark .border-gray-200 {
+        border-color: #404040 !important;
+    }
+    
+    .dark .hover\:bg-gray-50:hover {
+        background-color: #404040 !important;
+    }
+    
+    .dark .hover\:border-gray-200:hover,
+    .dark .hover\:border-gray-300:hover {
+        border-color: #555555 !important;
+    }
+    
+    /* Dark mode text styles */
+    .dark .text-gray-800 {
+        color: #FFFFFF !important;
+    }
+    
+    .dark .text-gray-600 {
+        color: #B0B0B0 !important;
+    }
+    
+    /* Dark mode shadow adjustments */
+    .dark .shadow-sm,
+    .dark .shadow-lg,
+    .dark .shadow-xl {
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Hover state utilities for theme colors */
+    .hover-theme-primary:hover {
+        background-color: rgba(139, 0, 0, 0.1) !important;
+    }
+    
+    .dark .hover-theme-primary:hover {
+        background-color: rgba(255, 107, 107, 0.1) !important;
+    }
+    
+    .hover-theme-light:hover {
+        background-color: rgba(139, 0, 0, 0.05) !important;
+    }
+    
+    .dark .hover-theme-light:hover {
+        background-color: rgba(255, 107, 107, 0.05) !important;
+    }
+    
+    /* Post content hover */
+    .post-content-hover:hover {
+        background-color: rgba(139, 0, 0, 0.02) !important;
+    }
+    
+    .dark .post-content-hover:hover {
+        background-color: rgba(255, 107, 107, 0.02) !important;
+    }
+    
+    /* Button hover states */
+    .btn-hover-theme:hover {
+        background-color: rgba(139, 0, 0, 0.1) !important;
+    }
+    
+    .dark .btn-hover-theme:hover {
+        background-color: rgba(255, 107, 107, 0.1) !important;
+    }
+    
+    /* Dropdown menu styling */
+    .custom-dropdown-menu {
+        background-color: white !important;
+        border: 1px solid rgba(139, 0, 0, 0.2) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .dark .custom-dropdown-menu {
+        background-color: #2D2D2D !important;
+        border: 1px solid rgba(255, 107, 107, 0.3) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .custom-dropdown-content {
+        background-color: transparent !important;
+    }
+    
+    .custom-dropdown-item {
+        background-color: transparent !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .custom-dropdown-item:hover {
+        background-color: rgba(139, 0, 0, 0.1) !important;
+    }
+    
+    .dark .custom-dropdown-item:hover {
+        background-color: rgba(255, 107, 107, 0.2) !important;
+    }
+    
+    .custom-dropdown-item-danger {
+        background-color: transparent !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .custom-dropdown-item-danger:hover {
+        background-color: rgba(239, 68, 68, 0.1) !important;
+    }
+    
+    .dark .custom-dropdown-item-danger:hover {
+        background-color: rgba(239, 68, 68, 0.2) !important;
+    }
+    
+    /* Profile button focus styling */
+    .profile-nav-button {
+        position: relative !important;
+        cursor: pointer !important;
+    }
+    
+    .profile-nav-button::after {
+        content: '' !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 2px !important;
+        background-color: #8B0000 !important;
+        border-radius: 9999px !important;
+        transition: all 0.3s ease !important;
+        opacity: 0 !important;
+        transform: scaleX(0) !important;
+    }
+    
+    .dark .profile-nav-button::after {
+        background-color: #FF6B6B !important;
+    }
+    
+    .profile-nav-button:hover::after {
+        opacity: 1 !important;
+        transform: scaleX(1) !important;
+    }
+    
+    .profile-nav-button:focus::after {
+        opacity: 1 !important;
+        transform: scaleX(1) !important;
+    }
+    
+    .profile-nav-button:focus-visible::after {
+        opacity: 1 !important;
+        transform: scaleX(1) !important;
+    }
+    
+    /* Remove old profile link styles */
+    .profile-link-focus::after {
+        display: none !important;
+    }
+    
+    .profile-focus-line {
+        display: none !important;
+    }
+    
+    /* Ensure the profile link has proper focus outline */
+    .profile-link-focus:focus {
+        outline: none !important;
+    }
+    
+    .profile-link-focus:focus-visible {
+        outline: none !important;
+    }
+    
+    /* Profile focus line using pseudo-element */
+    .profile-link-focus::after {
+        content: '' !important;
+        position: absolute !important;
+        bottom: -2px !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 2px !important;
+        border-radius: 9999px !important;
+        transition: all 0.3s ease !important;
+        opacity: 0 !important;
+        z-index: 10 !important;
+        background-color: #8B0000 !important;
+    }
+    
+    .dark .profile-link-focus::after {
+        background-color: #FF6B6B !important;
+    }
+    
+    .profile-link-focus:focus::after {
+        opacity: 1 !important;
+    }
+    
+    .profile-link-focus:focus-visible::after {
+        opacity: 1 !important;
+    }
+    
+    /* Profile focus line positioning */
+    .profile-focus-line {
+        position: absolute !important;
+        bottom: -2px !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: 2px !important;
+        border-radius: 9999px !important;
+        transition: all 0.3s ease !important;
+        opacity: 0 !important;
+        z-index: 10 !important;
+    }
+    
+    /* Ensure the profile link container has proper positioning */
+    .profile-link-focus {
+        position: relative !important;
+    }
+    .profile-nav-button span.absolute {
+        transition: all 0.3s ease;
+    }
+}
