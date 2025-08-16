@@ -49,20 +49,6 @@ export default function RegisterPage() {
 
   return (
     <div className="relative">
-      {/* Mobile Back Button */}
-      <div className="sm:hidden absolute top-4 left-4 z-20">
-        <button
-          onClick={() => navigator(-1)}
-          className="flex items-center gap-2 p-3 rounded-lg transition-colors"
-          style={{ 
-            color: themeColors.primary,
-            backgroundColor: themeColors.background + 'CC'
-          }}
-        >
-          <i className="fas fa-arrow-left text-lg"></i>
-          <span className="font-medium">Back</span>
-        </button>
-      </div>
     <div className="min-h-screen flex items-center justify-center p-6 relative">
       
       {/* Decorative Elements */}
@@ -78,7 +64,7 @@ export default function RegisterPage() {
       {/* Main Container */}
       <div className="relative z-10 w-full max-w-2xl">
         <div 
-          className="bg-white rounded-3xl p-10 shadow-xl border border-gray-200 relative"
+          className="bg-white rounded-3xl p-4 sm:p-6 lg:p-10 shadow-xl border border-gray-200 relative"
         >
           {/* Decorative corner elements */}
           <div 
@@ -99,22 +85,22 @@ export default function RegisterPage() {
           ></div>
 
           {/* Header */}
-          <div className="text-center mb-10 relative">
+          <div className="text-center mb-6 sm:mb-8 lg:mb-10 relative">
             <h1 
-              className="text-5xl font-bold mb-4"
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4"
               style={{ color: themeColors.primary }}
             >
               Join SocialHub
             </h1>
             <p 
-              className="text-xl font-medium"
+              className="text-lg sm:text-xl font-medium"
               style={{ color: themeColors.text }}
             >
               Start your journey with us
             </p>
             
             {/* Decorative line */}
-            <div className="flex justify-center items-center mt-6 space-x-2">
+            <div className="flex justify-center items-center mt-3 sm:mt-4 lg:mt-6 space-x-2">
               <div 
                 className="w-8 h-1 rounded-full"
                 style={{ backgroundColor: themeColors.primary }}

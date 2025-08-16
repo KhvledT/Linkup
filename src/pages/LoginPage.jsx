@@ -38,20 +38,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-8 relative">
       
-      {/* Mobile Back Button */}
-      <div className="sm:hidden absolute top-4 left-4 z-20">
-        <button
-          onClick={() => navigator(-1)}
-          className="flex items-center gap-2 p-3 rounded-lg transition-colors"
-          style={{ 
-            color: themeColors.primary,
-            backgroundColor: themeColors.background + 'CC'
-          }}
-        >
-          <i className="fas fa-arrow-left text-lg"></i>
-          <span className="font-medium">Back</span>
-        </button>
-      </div>
 
       {/* Decorative Elements */}
       <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-8 blur-sm"
@@ -66,37 +52,37 @@ export default function LoginPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           
           {/* Left Side - Branding */}
-          <div className="text-center lg:text-left space-y-6">
+          <div className="text-center lg:text-left space-y-4 sm:space-y-6">
             <div className="relative">
               <h1 
-                className="text-7xl font-bold mb-4 tracking-tight"
+                className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-2 sm:mb-4 tracking-tight"
                 style={{ color: themeColors.primary }}
               >
                 Linkup
               </h1>
               <div 
-                className="absolute -top-2 -right-2 w-8 h-8 rounded-full opacity-60"
+                className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-8 sm:h-8 rounded-full opacity-60"
                 style={{ backgroundColor: themeColors.secondary }}
               ></div>
               <div 
-                className="absolute -bottom-2 -left-2 w-6 h-6 transform rotate-45 opacity-60"
+                className="absolute -bottom-1 -left-1 sm:-bottom-2 sm:-left-2 w-3 h-3 sm:w-6 sm:h-6 transform rotate-45 opacity-60"
                 style={{ backgroundColor: themeColors.primary }}
               ></div>
             </div>
             
             <p 
-              className="text-2xl font-medium leading-relaxed max-w-lg"
+              className="text-lg sm:text-xl lg:text-2xl font-medium leading-relaxed max-w-lg"
               style={{ color: themeColors.text }}
             >
               Connect with friends and the world around you in a warm, vibrant community.
             </p>
             
             {/* Decorative dots */}
-            <div className="flex justify-center lg:justify-start space-x-2 mt-8">
+            <div className="flex justify-center lg:justify-start space-x-2 mt-4 sm:mt-8">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div 
                   key={i}
-                  className="w-3 h-3 rounded-full opacity-60"
+                  className="w-2 h-2 sm:w-3 sm:h-3 rounded-full opacity-60"
                   style={{ backgroundColor: themeColors.secondary }}
                 ></div>
               ))}
@@ -106,7 +92,7 @@ export default function LoginPage() {
           {/* Right Side - Login Form */}
           <div className="relative">
             <div 
-              className="bg-white rounded-2xl p-8 shadow-xl border border-gray-200"
+              className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl border border-gray-200"
             >
               {/* Form decorative elements */}
               <div 
