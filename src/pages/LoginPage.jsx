@@ -38,6 +38,21 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-8 relative">
       
+      {/* Mobile Back Button */}
+      <div className="sm:hidden absolute top-4 left-4 z-20">
+        <button
+          onClick={() => navigator(-1)}
+          className="flex items-center gap-2 p-3 rounded-lg transition-colors"
+          style={{ 
+            color: themeColors.primary,
+            backgroundColor: themeColors.background + 'CC'
+          }}
+        >
+          <i className="fas fa-arrow-left text-lg"></i>
+          <span className="font-medium">Back</span>
+        </button>
+      </div>
+
       {/* Decorative Elements */}
       <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-8 blur-sm"
            style={{ backgroundColor: themeColors.primary }}></div>

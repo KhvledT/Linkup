@@ -48,6 +48,21 @@ export default function RegisterPage() {
   })
 
   return (
+    <div className="relative">
+      {/* Mobile Back Button */}
+      <div className="sm:hidden absolute top-4 left-4 z-20">
+        <button
+          onClick={() => navigator(-1)}
+          className="flex items-center gap-2 p-3 rounded-lg transition-colors"
+          style={{ 
+            color: themeColors.primary,
+            backgroundColor: themeColors.background + 'CC'
+          }}
+        >
+          <i className="fas fa-arrow-left text-lg"></i>
+          <span className="font-medium">Back</span>
+        </button>
+      </div>
     <div className="min-h-screen flex items-center justify-center p-6 relative">
       
       {/* Decorative Elements */}
@@ -318,6 +333,7 @@ export default function RegisterPage() {
           </form>
         </div>
       </div>
+    </div>
     </div>
   );
 }

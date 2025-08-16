@@ -1,6 +1,7 @@
 import React, { useContext, useRef, useState } from "react";
 import { getUserDetails, UploadUserImage } from "../Services/UserDetailsServices";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import LoadingPage from "./LoadingPage";
 import ErrorMessage from "../components/ErrorMessage";
 import FetchingIcon from "../components/FetchingIcon";
@@ -13,6 +14,7 @@ import { AuthContext } from "../Contexts/AuthContext.jsx";
 export default function ProfilePage() {
   const fileInputRef = useRef(null);
   const { themeColors } = useTheme();
+  const navigate = useNavigate();
   const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const { userID } = useContext(AuthContext);
@@ -56,6 +58,21 @@ export default function ProfilePage() {
 
   return (
     <div className="w-full">
+      {/* Mobile Back Button */}
+      <div className="sm:hidden mb-4 px-4">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 p-2 rounded-lg transition-colors"
+          style={{ 
+            color: themeColors.primary,
+            backgroundColor: themeColors.primary + '10'
+          }}
+        >
+          <i className="fas fa-arrow-left text-lg"></i>
+          <span className="font-medium">Back to Feed</span>
+        </button>
+      </div>
+
       {isFetching && !isLoading && <FetchingIcon />}
       {isLoading 
       ?

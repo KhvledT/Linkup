@@ -51,6 +51,7 @@ export default function NavbarComponent() {
       className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100/50 sticky top-0 z-50 py-2"
       style={{ backgroundColor: `${themeColors.background}E6` }}
       maxWidth="xl"
+      isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
     >
       {/* Left: Logo Area */}
@@ -167,13 +168,13 @@ export default function NavbarComponent() {
         {isloggedIn ? (
           <>
             <NavbarMenuItem>
-              <button
+              <Link
+                to="/profile"
                 onClick={() => {
-                  navigate('/profile');
-                  setProfilePageIsOpen(true);
                   setIsMenuOpen(false);
+                  setProfilePageIsOpen(true);
                 }}
-                className="w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center gap-3"
+                className="w-full block p-4 rounded-xl transition-all duration-300 flex items-center gap-3"
                 style={{
                   color: themeColors.text,
                   backgroundColor: profilePageIsOpen ? `${themeColors.primary}15` : 'transparent'
@@ -181,13 +182,14 @@ export default function NavbarComponent() {
               >
                 <i className="fas fa-user-circle text-xl" style={{ color: themeColors.primary }}></i>
                 <span className="font-semibold text-lg">Profile</span>
-              </button>
+              </Link>
             </NavbarMenuItem>
             <NavbarMenuItem>
               <button
-                onClick={() => {
-                  handleLogout();
+                onClick={(e) => {
+                  e.preventDefault();
                   setIsMenuOpen(false);
+                  handleLogout();
                 }}
                 className="w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center gap-3"
                 style={{ color: themeColors.text }}
@@ -200,22 +202,24 @@ export default function NavbarComponent() {
         ) : (
           <>
             <NavbarMenuItem>
-              <button
+              <Link
+                to="/login"
                 onClick={() => {
-                  handleLogin();
                   setIsMenuOpen(false);
                 }}
-                className="w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center gap-3"
+                className="w-full block p-4 rounded-xl transition-all duration-300 flex items-center gap-3"
                 style={{ color: themeColors.text }}
               >
                 <i className="fas fa-sign-in-alt text-xl" style={{ color: themeColors.primary }}></i>
                 <span className="font-semibold text-lg">Login</span>
-              </button>
+              </Link>
             </NavbarMenuItem>
             <NavbarMenuItem>
               <Link
                 to="/register"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                }}
                 className="w-full block p-4 rounded-xl transition-all duration-300 flex items-center gap-3"
                 style={{ color: themeColors.text }}
               >
