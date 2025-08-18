@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
+import ChangePasswordModal from './ChangePasswordModal.jsx';
 
 export default function SettingsModal({ isOpen, onClose }) {
   const { themeColors, isDarkMode, toggleDarkMode } = useTheme();
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -11,8 +13,7 @@ export default function SettingsModal({ isOpen, onClose }) {
   };
 
   const handleChangePassword = () => {
-    // TODO: Implement change password functionality
-    console.log('Change password clicked - functionality coming soon!');
+    setIsChangePasswordModalOpen(true);
   };
 
   return (
@@ -141,15 +142,6 @@ export default function SettingsModal({ isOpen, onClose }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span 
-                    className="text-xs px-2 py-1 rounded-full"
-                    style={{ 
-                      backgroundColor: themeColors.primary,
-                      color: 'white'
-                    }}
-                  >
-                    Coming Soon
-                  </span>
                   <i 
                     className="fas fa-chevron-right text-sm"
                     style={{ color: themeColors.textSecondary }}
@@ -202,6 +194,12 @@ export default function SettingsModal({ isOpen, onClose }) {
           </div>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
+      />
     </div>
   );
 }

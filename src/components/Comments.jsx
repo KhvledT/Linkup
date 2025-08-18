@@ -6,72 +6,50 @@ import { deleteComment, updateComment } from '../Services/CommentServices';
 import CommentHeader from './CommentHeader';
 import CommentEditBox from './CommentEditBox';
 import { useMutation } from '@tanstack/react-query';
-import { invalidateAndRefetch } from '../utils/queryUtils';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
+import { queryClient } from '../App.jsx';
 
-export default function Comments({ post, commentLimit, from, getPostDetails, getPosts, getUserPosts }) {
+export default function Comments({ post, commentLimit }) {
   const { themeColors } = useTheme();
   const { userID } = useContext(AuthContext);
   const [editComment, setEditComment] = useState(null); 
   const [commentText, setCommentText] = useState('');
-  const [isSubmitting, setisSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Delete comment mutation
   const { mutate: handleDeleteComment } = useMutation({
     mutationFn: (commentId) => deleteComment(commentId),
     onSuccess: () => {
-      // Use standardized invalidation and refetch
-      invalidateAndRefetch({
-        from,
-        getPosts,
-        getPostDetails,
-        getUserPosts,
-        postId: post._id
-      });
+      queryClient.invalidateQueries(['posts']); // Refetch feed تلقائي بعد حذف الكومنت
     },
   });
 
   // Edit comment mutation
   const { mutate: handleEditComment } = useMutation({
     mutationFn: ({ commentId, content }) => updateComment(commentId, { content }),
-    onSuccess: (_, variables) => {
-      // Use standardized invalidation and refetch
-      invalidateAndRefetch({
-        from,
-        getPosts,
-        getPostDetails,
-        getUserPosts,
-        postId: post._id
-      });
-      
-      setisSubmitting(false);
-      setEditComment((prev) =>
-        prev === variables.commentId ? null : variables.commentId
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries(['posts']); // Refetch feed بعد تعديل الكومنت
+      setIsSubmitting(false);
+      setEditComment(null);
+      setCommentText('');
     },
   });
 
   function editCommentPreview(commentId, content) {
-    setCommentText(content); // يملأ الـ input بالمحتوى الحالي
+    setCommentText(content);
     setEditComment((prev) => (prev === commentId ? null : commentId));
   }
 
   return (
     <>
-      {post.comments?.length > 0 && (
-        <div 
+      {post?.comments?.length > 0 && (
+        <div
           className="max-w-2xl mx-auto rounded-xl p-2 border"
-          style={{ 
-            backgroundColor: themeColors.surface,
-            borderColor: themeColors.primary + '20'
-          }}
+          style={{ backgroundColor: themeColors.surface, borderColor: themeColors.primary + '20' }}
         >
-          <h2 
+          <h2
             className="text-lg font-bold mb-4 border-b pb-2"
-            style={{ 
-              color: themeColors.text,
-              borderColor: themeColors.primary + '20'
-            }}
+            style={{ color: themeColors.text, borderColor: themeColors.primary + '20' }}
           >
             Comments
           </h2>
@@ -80,29 +58,20 @@ export default function Comments({ post, commentLimit, from, getPostDetails, get
             .slice(0, commentLimit)
             .reverse()
             .map((comment, index) => (
-              <div 
-                key={index} 
-                className="mb-4 pb-3 border-b last:border-b-0"
-                style={{ borderColor: themeColors.primary + '10' }}
-              >
+              <div key={index} className="mb-4 pb-3 border-b last:border-b-0" style={{ borderColor: themeColors.primary + '10' }}>
                 <div className="flex items-start justify-between space-x-3 rtl:space-x-reverse">
-                  {/* صورة + بيانات */}
                   <CommentHeader comment={comment} fakeCommentPhoto={fakeCommentPhoto} />
 
-                  {/* زر القائمة */}
                   {comment.commentCreator._id === userID && (
                     <DropDown
                       commentId={comment._id}
                       handleDeleteComment={handleDeleteComment}
-                      editCommentPreview={() =>
-                        editCommentPreview(comment._id, comment.content)
-                      }
+                      editCommentPreview={() => editCommentPreview(comment._id, comment.content)}
                       Type="comment"
                     />
                   )}
                 </div>
 
-                {/* Edit Box */}
                 {editComment === comment._id && (
                   <CommentEditBox
                     comment={comment}
@@ -111,10 +80,7 @@ export default function Comments({ post, commentLimit, from, getPostDetails, get
                     setCommentText={setCommentText}
                     isSubmitting={isSubmitting}
                     handleEditComment={() =>
-                      handleEditComment({
-                        commentId: comment._id,
-                        content: commentText,
-                      })
+                      handleEditComment({ commentId: comment._id, content: commentText })
                     }
                   />
                 )}

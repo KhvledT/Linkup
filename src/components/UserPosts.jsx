@@ -13,7 +13,7 @@ export default function UserPosts({userID}) {
         refetchOnReconnect: true,
         refetchOnMount: true,
         retry: 2,
-        staleTime : 15000,
+        staleTime : 30000,
     })
 
     return (

@@ -1,12 +1,14 @@
 import DropDown from './DropDown'
 import { useTheme } from '../Contexts/ThemeContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 export default function PostHeader({post , fakePost , userID , handleEditPost , handleDeletePost}) {
   const { themeColors } = useTheme();
+  const navigate = useNavigate();
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 cursor-pointer" onClick={() => navigate(`/user-page/${post?._id}`)}>
         <div className="relative">
           <img
             src={

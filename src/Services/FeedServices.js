@@ -1,16 +1,21 @@
 import axios from "axios";
 const BASE_URL = "https://linked-posts.routemisr.com/";
 
-export const getAllPosts = () => {
-  return axios.get(`${BASE_URL}posts?limit=50`, {
-      headers: {
-        token: localStorage.getItem("token"),
-      },
-      params: { 
-        sort: "-createdAt",
-      },
-    })
-}
+export const getAllPosts = (page = 1) => {
+  return axios.get(`${BASE_URL}posts`, {
+    headers: {
+      token: localStorage.getItem("token"),
+    },
+    params: {
+      limit: 50,
+      page,
+      sort: "-createdAt",
+    },
+  });
+};
+
+
+
 
 export const postDetails = (id) => {
   return axios.get(`${BASE_URL}posts/${id}`, {

@@ -25,3 +25,11 @@ export const getUserPosts = (id) => {
     })
 }
 
+export const changeUserPassword = (body) => {
+  return axios.patch(`${BASE_URL}users/change-password`,body, {
+      headers: {
+        token: localStorage.getItem("token"),
+      },
+    })
+}
+

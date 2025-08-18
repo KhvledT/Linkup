@@ -1,92 +1,108 @@
-import  { useContext, useEffect } from 'react'
-import Post from '../components/Post'
-import { getAllPosts } from '../Services/FeedServices'
+import { useContext, useEffect, useRef } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'react-router-dom';
+import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
 import LoadingPage from './LoadingPage';
+import ErrorMessage from '../components/ErrorMessage.jsx';
+import FetchingIcon from '../components/FetchingIcon';
+import { getAllPosts } from '../Services/FeedServices';
 import { getUserDetails } from '../Services/UserDetailsServices';
 import { AuthContext } from '../Contexts/AuthContext';
-import { useTheme } from '../Contexts/ThemeContext.jsx';
-import { useQuery } from '@tanstack/react-query';
-import { Button, Spinner } from '@heroui/react';
-import FetchingIcon from '../components/FetchingIcon';
-import Sidebar from '../components/Sidebar';
 
-export default function FeedPage() { 
+export default function FeedPage() {
   const { setUserID } = useContext(AuthContext);
-  const { themeColors } = useTheme();
+  const loadMoreRef = useRef(null);
+  const location = useLocation();
 
-  const { data, isLoading, refetch, isFetching ,error ,isError } = useQuery({
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    isError,
+    error,
+    refetch
+  } = useInfiniteQuery({
     queryKey: ['posts'],
-    queryFn: getAllPosts,
+    queryFn: ({ pageParam = 1 }) => getAllPosts(pageParam),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.data.posts.length < 50 ? undefined : allPages.length + 1,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: true,
-    refetchOnMount: true,
-    retry: 2,
-    staleTime : 15000
-  })
+    staleTime: 15000,
+  });
 
-   async function getUserID(){
-      if (localStorage.getItem('userID')) {
-        setUserID(localStorage.getItem('userID'));
-      } else {
-          const userID = await getUserDetails();
-          if (userID.data.user._id) {
-              setUserID(userID.data.user._id);
-              localStorage.setItem('userID', userID.data.user._id);
-              
-          }
+  async function getUserID() {
+    if (localStorage.getItem('userID')) {
+      setUserID(localStorage.getItem('userID'));
+    } else {
+      const userID = await getUserDetails();
+      if (userID.data.user._id) {
+        setUserID(userID.data.user._id);
+        localStorage.setItem('userID', userID.data.user._id);
       }
+    }
   }
+
   useEffect(() => {
     getUserID();
   }, []);
 
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '10000px' }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [loadMoreRef, hasNextPage, fetchNextPage]);
+
+  // Refetch when location changes to FeedPage
+  useEffect(() => {
+    if (location.pathname === '/feed') {
+      refetch();
+    }
+  }, [location.pathname, refetch]);
+
   return (
     <div className="w-full">
-      {/* Create Post Section */}
       <div className="mb-8">
-        <CreatePost getPosts={refetch} />
+        <CreatePost />
       </div>
 
-      {/* Posts Feed */}
       <div className="space-y-8">
-        {(isFetching && !isLoading) && <FetchingIcon />}
-        
+        {isFetching && !isLoading && <FetchingIcon />}
         {isLoading ? (
           <LoadingPage />
         ) : isError ? (
-          <div 
-            className="flex flex-col gap-4 justify-center items-center p-10 rounded-2xl bg-white border border-gray-200 shadow-lg"
-          >
-            <h1 
-              className="text-3xl font-bold"
-              style={{ color: themeColors.primary }}
-            >
-              {error.message}
-            </h1>
-            <Button 
-              onPress={refetch}
-              className="px-8 py-3 rounded-xl font-semibold text-lg"
-              style={{ 
-                backgroundColor: themeColors.primary,
-                color: "white"
-              }}
-            >
-              Retry
-            </Button>
-          </div>
+          <ErrorMessage error={error} refetch={refetch} />
         ) : (
-          data?.data.posts.map(post => (
-            <Post 
-              key={post?._id} 
-              post={post} 
-              postId={post?._id} 
-              commentLimit={1} 
-              getPosts={refetch} 
-              from={"feedPage"}
-            />
-          ))
+          <>
+            {data.pages.map((page, i) => (
+              <div key={i} className="space-y-3">
+                {page.data.posts.map((post) => (
+                  <Post
+                    key={post?._id}
+                    post={post}
+                    postId={post?._id}
+                    commentLimit={1}
+                    from={'feedPage'}
+                  />
+                ))}
+              </div>
+            ))}
+          </>
         )}
+        <div ref={loadMoreRef} />
+        {isFetchingNextPage && <FetchingIcon />}
       </div>
     </div>
   );

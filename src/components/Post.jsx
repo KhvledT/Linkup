@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import {useNavigate, useParams  } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Comments from "./Comments";
 import CreateComment from "./CreateComment";
 import { AuthContext } from "../Contexts/AuthContext";
@@ -11,55 +11,42 @@ import fakeProfilePhoto from "../../public/FakeProfileImage.png";
 import PostBtns from "./PostBtns";
 import { useMutation } from "@tanstack/react-query";
 import { invalidateAndRefetch } from "../utils/queryUtils";
+import PostImageModal from "./PostImageModal"; // <--- استدعاء الكومبوننت الجديد
 
 const fakePost = {
   userAvatar: fakeProfilePhoto,
-  likes: 120,
-  shares: 30,
+  likes: 0,
+  shares: 0,
 };
 
-export default function Post({ post, commentLimit = 1000, getPostDetails, getPosts, getUserPosts ,postId , from }) {
-  const {userID} = useContext(AuthContext);
+export default function Post({ post, commentLimit = 1000, getPostDetails, getPosts, getUserPosts, postId, from }) {
+  const { userID } = useContext(AuthContext);
   const { themeColors } = useTheme();
   const navigator = useNavigate();
   const [showCommentField, setShowCommentField] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false); // <--- حالة فتح المودال
 
-  if (getPostDetails){
-    const {id} = useParams();
+  if (getPostDetails) {
+    const { id } = useParams();
     postId = id;
   }
   
-  const {mutate : handleDeletePost} = useMutation({
+  const { mutate: handleDeletePost } = useMutation({
     mutationFn: (postId) => deletePost(postId),
-    onSuccess: (data) => {
-        // Use standardized invalidation and refetch
-        invalidateAndRefetch({
-            from,
-            getPosts,
-            getPostDetails
-        });
-        
-        // Navigate if on post details page
-        if(from === "PostDetailsPage") {
-          navigator('/');
-        }else if(from === "userProfilePage") {
-          getUserPosts(userID);
-        }
-      },
-      onError: (error) => {
-        console.log(error);
-        
-      }
-  })
+    onSuccess: () => {
+      invalidateAndRefetch({ from, getPosts, getPostDetails });
 
-  function handleEditPost(postId) {
-    console.log(postId);
+      if (from === "PostDetailsPage") navigator('/');
+      else if (from === "userProfilePage") getUserPosts(userID);
+    },
+    onError: (error) => console.log(error)
+  });
+
+  const handleEditPost = (postId) => {
     navigator(`/edit-post/${postId}`);
-  }
-
-  const handleCommentClick = () => {
-    setShowCommentField(!showCommentField);
   };
+
+  const handleCommentClick = () => setShowCommentField(!showCommentField);
 
   const handlePostClick = () => {
     if (from === "feedPage" || from === "userProfilePage") {
@@ -68,37 +55,35 @@ export default function Post({ post, commentLimit = 1000, getPostDetails, getPos
   };
 
   return (
-    <div 
+    <div
       className="rounded-2xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md border"
-      style={{ 
+      style={{
         backgroundColor: themeColors.surface,
         borderColor: themeColors.primary + '20'
       }}
     >
       {/* Post Header */}
-      <div 
+      <div
         className="p-3 sm:p-4 lg:p-5 border-b"
         style={{ borderColor: themeColors.primary + '10' }}
       >
-        <PostHeader 
-          post={post} 
-          fakePost={fakePost} 
-          userID={userID} 
-          handleEditPost={handleEditPost} 
-          handleDeletePost={handleDeletePost} 
+        <PostHeader
+          post={post}
+          fakePost={fakePost}
+          userID={userID}
+          handleEditPost={handleEditPost}
+          handleDeletePost={handleDeletePost}
         />
       </div>
 
       {/* Post Content */}
       {post?.body && (
-        <div 
+        <div
           className="p-3 sm:p-4 lg:p-5 cursor-pointer transition-colors duration-200 post-content-hover"
-          style={{ 
-            backgroundColor: themeColors.primary + '02'
-          }}
+          style={{ backgroundColor: themeColors.primary + '02' }}
           onClick={handlePostClick}
         >
-          <p 
+          <p
             className="text-base sm:text-lg leading-relaxed"
             style={{ color: themeColors.text }}
           >
@@ -109,20 +94,29 @@ export default function Post({ post, commentLimit = 1000, getPostDetails, getPos
 
       {/* Post Image */}
       {post?.image && (
-        <div 
-          className="relative cursor-pointer hover:opacity-95 transition-opacity duration-200"
-          onClick={handlePostClick}
-        >
-          <img
-            src={post.image}
-            alt="Post"
-            className="w-full h-auto object-cover"
+        <>
+          <div
+            className="relative cursor-pointer hover:opacity-95 transition-opacity duration-200"
+            onClick={() => setShowImageModal(true)}
+          >
+            <img
+              src={post.image}
+              alt="Post"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+
+          {/* Image Modal */}
+          <PostImageModal
+            isOpen={showImageModal}
+            onClose={() => setShowImageModal(false)}
+            imageUrl={post.image}
           />
-        </div>
+        </>
       )}
 
       {/* Post Statistics */}
-      <div 
+      <div
         className="px-3 sm:px-4 lg:px-5 py-2 sm:py-3 border-b"
         style={{ borderColor: themeColors.primary + '10' }}
       >
@@ -131,12 +125,12 @@ export default function Post({ post, commentLimit = 1000, getPostDetails, getPos
 
       {/* Post Action Buttons */}
       <div className="px-3 sm:px-4 lg:px-5 py-2 sm:py-3">
-        <PostBtns post={post} onCommentClick={handleCommentClick} />
+        <PostBtns from={from} post={post} onCommentClick={handleCommentClick} />
       </div>
 
-      {/* Create Comment - Only show on feed page when comment button is clicked */}
+      {/* Create Comment - feed page */}
       {from === "feedPage" && showCommentField && (
-        <div 
+        <div
           className="px-3 sm:px-4 lg:px-5 py-2 sm:py-3 border-b"
           style={{ borderColor: themeColors.primary + '10' }}
         >
@@ -144,9 +138,9 @@ export default function Post({ post, commentLimit = 1000, getPostDetails, getPos
         </div>
       )}
 
-      {/* Create Comment - Show on post details page always, on profile page when comment button clicked */}
+      {/* Create Comment - post details / profile */}
       {(from === "PostDetailsPage" || (from === "userProfilePage" && showCommentField)) && (
-        <div 
+        <div
           className="px-3 sm:px-4 lg:px-5 py-2 sm:py-3 border-b"
           style={{ borderColor: themeColors.primary + '10' }}
         >
@@ -156,13 +150,13 @@ export default function Post({ post, commentLimit = 1000, getPostDetails, getPos
 
       {/* Comments Section */}
       <div className="px-3 sm:px-4 lg:px-5 py-2 sm:py-3">
-        <Comments 
-          post={post} 
-          commentLimit={commentLimit} 
-          getPostDetails={getPostDetails} 
-          getPosts={getPosts} 
+        <Comments
+          post={post}
+          commentLimit={commentLimit}
+          getPostDetails={getPostDetails}
+          getPosts={getPosts}
           getUserPosts={getUserPosts}
-          from={from}   
+          from={from}
         />
       </div>
     </div>

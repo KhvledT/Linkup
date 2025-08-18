@@ -87,7 +87,7 @@ export default function EditPostPage () {
             <div className="flex items-center gap-3 mb-2">
               {/* Mobile Back Button */}
               <button
-                onClick={() => navigator(-1)}
+                onClick={() => navigator(`/post-details/${id}`)}
                 className="sm:hidden p-2 rounded-lg transition-colors"
                 style={{ 
                   color: themeColors.primary,

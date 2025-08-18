@@ -31,7 +31,7 @@ export default function PostDetailsPage() {
       {/* Mobile Back Button */}
       <div className="sm:hidden mb-4 px-4">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/`)}
           className="flex items-center gap-2 p-2 rounded-lg transition-colors"
           style={{ 
             color: themeColors.primary,
