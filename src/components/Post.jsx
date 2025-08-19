@@ -102,7 +102,7 @@ export default function Post({ post, commentLimit = 1000, getPostDetails, getPos
             <img
               src={post.image}
               alt="Post"
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-cover max-h-[400px]"
             />
           </div>
 
@@ -120,7 +120,7 @@ export default function Post({ post, commentLimit = 1000, getPostDetails, getPos
         className="px-3 sm:px-4 lg:px-5 py-2 sm:py-3 border-b"
         style={{ borderColor: themeColors.primary + '10' }}
       >
-        <PostStatistics post={post} fakePost={fakePost} />
+        <PostStatistics post={post} fakePost={fakePost} handlePostClick={handlePostClick} />
       </div>
 
       {/* Post Action Buttons */}

@@ -7,7 +7,7 @@ import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Contexts/AuthContext.jsx';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 export default function RegisterPage() {
   const [success, setSuccess] = useState('');
@@ -15,6 +15,7 @@ export default function RegisterPage() {
   const navigator = useNavigate();
   const { setIsloggedIn } = useContext(AuthContext);
   const { themeColors } = useTheme();
+  const [showPassword, setShowPassword] = useState(false); // ✅ toggle state
 
   const { handleSubmit, register, formState: { errors }, watch } = useForm({
     defaultValues: {
@@ -90,7 +91,8 @@ export default function RegisterPage() {
               className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4"
               style={{ color: themeColors.primary }}
             >
-              Join SocialHub
+              <i className="fa-solid fa-link pe-16"></i> 
+              Join Linkup
             </h1>
             <p 
               className="text-lg sm:text-xl font-medium"
@@ -129,7 +131,7 @@ export default function RegisterPage() {
                   classNames={{
                     input: "custom-input",
                     inputWrapper: `custom-input-wrapper ${Boolean(errors.name?.message) ? 'is-invalid' : ''}`,
-                    label: "text-gray-700",
+                    label: "text-gray-300",
                     errorMessage: "text-red-500"
                   }}
                   {...register('name')}
@@ -150,7 +152,7 @@ export default function RegisterPage() {
                   classNames={{
                     input: "custom-input",
                     inputWrapper: `custom-input-wrapper ${Boolean(errors.email?.message) ? 'is-invalid' : ''}`,
-                    label: "text-gray-700",
+                    label: "text-gray-300",
                     errorMessage: "text-red-500"
                   }}
                   {...register('email')}
@@ -169,19 +171,27 @@ export default function RegisterPage() {
                   isInvalid={Boolean(errors.password?.message)}
                   errorMessage={errors.password?.message}
                   label="Password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   classNames={{
                     input: "custom-input",
                     inputWrapper: `custom-input-wrapper ${Boolean(errors.password?.message) ? 'is-invalid' : ''}`,
-                    label: "text-gray-700",
+                    label: "text-gray-300",
                     errorMessage: "text-red-500"
                   }}
                   {...register('password')}
                 />
-                <div 
-                  className="absolute top-3 right-3 w-2 h-2 rounded-full opacity-60"
-                  style={{ backgroundColor: themeColors.primary }}
-                ></div>
+                {/*  Toggle Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute top-1/2 right-5  -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                  >
+                    {showPassword ? (
+                      <i className="fa-solid fa-eye-slash"></i>
+                    ) : (
+                      <i className="fa-solid fa-eye"></i>
+                    )}
+                  </button>
               </div>
 
               <div className="relative">
@@ -190,19 +200,27 @@ export default function RegisterPage() {
                   isInvalid={Boolean(errors.rePassword?.message)}
                   errorMessage={errors.rePassword?.message}
                   label="Confirm Password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   classNames={{
                     input: "custom-input",
                     inputWrapper: `custom-input-wrapper ${Boolean(errors.rePassword?.message) ? 'is-invalid' : ''}`,
-                    label: "text-gray-700",
+                    label: "text-gray-300",
                     errorMessage: "text-red-500"
                   }}
                   {...register('rePassword')}
                 />
-                <div 
-                  className="absolute top-3 right-3 w-2 h-2 rounded-full opacity-60"
-                  style={{ backgroundColor: themeColors.primary }}
-                ></div>
+                {/*  Toggle Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute top-1/2 right-5  -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                  >
+                    {showPassword ? (
+                      <i className="fa-solid fa-eye-slash"></i>
+                    ) : (
+                      <i className="fa-solid fa-eye"></i>
+                    )}
+                  </button>
               </div>
             </div>
 
@@ -217,7 +235,7 @@ export default function RegisterPage() {
                   classNames={{
                     input: "custom-input",
                     inputWrapper: `custom-input-wrapper ${Boolean(errors.dateOfBirth?.message) ? 'is-invalid' : ''}`,
-                    label: "text-gray-700",
+                    label: "text-gray-300",
                     errorMessage: "text-red-500"
                   }}
                   {...register('dateOfBirth')}
@@ -238,7 +256,7 @@ export default function RegisterPage() {
                   selectedKeys={watchedGender ? [watchedGender] : []}
                   classNames={{
                     trigger: `custom-select-trigger ${Boolean(errors.gender?.message) ? 'is-invalid' : ''}`,
-                    label: "text-gray-700",
+                    label: "text-gray-300",
                     errorMessage: "text-red-500",
                     listbox: "custom-select-listbox",
                     listboxWrapper: "custom-select-listbox"
@@ -255,10 +273,7 @@ export default function RegisterPage() {
                   <SelectItem key="male" className="custom-select-item">Male</SelectItem>
                   <SelectItem key="female" className="custom-select-item">Female</SelectItem>
                 </Select>
-                <div 
-                  className="absolute top-3 right-3 w-2 h-2 rounded-full opacity-60"
-                  style={{ backgroundColor: themeColors.primary }}
-                ></div>
+                
               </div>
             </div>
 

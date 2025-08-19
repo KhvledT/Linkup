@@ -58,6 +58,7 @@ export default function CreatePost() {
       {showForm ? (
         <form className="space-y-4" onSubmit={handleReload}>
           <textarea
+            autoFocus
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="What's on your mind?"

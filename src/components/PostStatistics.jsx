@@ -1,11 +1,14 @@
 import React from 'react'
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 
-export default function PostStatistics({post , fakePost}) {
+export default function PostStatistics({post , fakePost , handlePostClick}) {
   const { themeColors } = useTheme();
 
   return (
-    <div className="flex justify-center items-center px-2 sm:px-4 py-1 sm:py-2">
+    <div 
+    className="flex justify-center items-center px-2 sm:px-4 py-1 sm:py-2 cursor-pointer"
+    onClick={handlePostClick}
+    >
       <div className="flex items-center justify-between w-full max-w-md">
         <div className="flex items-center gap-1 sm:gap-2">
           <div 

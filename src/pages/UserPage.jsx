@@ -10,7 +10,7 @@ import FetchingIcon from "../components/FetchingIcon.jsx";
 
 export default function UserPage() {
   const navigate = useNavigate();
-  const { id } = useParams(); // postId
+  const { id } = useParams();
   const [previewImage, setPreviewImage] = useState(false);
   const { themeColors } = useTheme();
 
@@ -29,20 +29,29 @@ export default function UserPage() {
   if (isError) return <ErrorMessage error="حدث خطأ" refetch={refetch} />;
 
   return (
-    <div className="h-fit bg-white rounded-2xl shadow-lg border border-gray-100 w-full pt-10 pb-20 px-4 sm:px-6">
+    <div
+      className="h-fit rounded-2xl shadow-lg w-full pt-10 pb-20 px-4 sm:px-6 transition-all"
+      style={{
+        backgroundColor: themeColors.surface,
+        border: `1px solid ${themeColors.primary}20`,
+      }}
+    >
       {/* back button */}
       <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 mb-6 rounded-lg p-2 transition-all sm:hidden"
-            style={{ color: themeColors.primary, backgroundColor: themeColors.primary + "10" }}
-            >
-            <i className="fas fa-arrow-left"></i>
-            Back
-        </button>
+        onClick={() => navigate("/")}
+        className="flex items-center gap-2 mb-6 rounded-lg p-2 transition-all sm:hidden"
+        style={{
+          color: themeColors.primary,
+          backgroundColor: themeColors.primary + "20",
+        }}
+      >
+        <i className="fas fa-arrow-left"></i>
+        Back
+      </button>
 
       {/* User Card */}
       <div
-        className="w-full  p-6 flex flex-col items-center transition-all"
+        className="w-full p-6 flex flex-col items-center transition-all"
         style={{ borderColor: themeColors.primary + "20" }}
       >
         {/* Profile Image */}
@@ -66,22 +75,51 @@ export default function UserPage() {
         )}
 
         {/* Name */}
-        <h2 className="text-2xl sm:text-3xl font-bold mt-4 flex items-center gap-2" style={{ color: themeColors.text }}>
-          <i className="fas fa-user text-xl sm:text-2xl" style={{ color: themeColors.primary }}></i>
+        <h2
+          className="text-2xl sm:text-3xl font-bold mt-4 flex items-center gap-2"
+          style={{ color: themeColors.text }}
+        >
+          <i
+            className="fas fa-user text-xl sm:text-2xl"
+            style={{ color: themeColors.primary }}
+          ></i>
           {user?.name}
         </h2>
 
-        {/* Optional Bio or Info Card */}
+        {/* Info Card */}
         <div
-          className="mt-6 w-full bg-gray-50 rounded-xl p-4 border border-gray-100 flex flex-col gap-2 hover:bg-gray-100 transition-all duration-300"
-          style={{ borderColor: themeColors.primary + "20" }}
+          className="mt-6 w-full rounded-2xl p-6 border shadow-sm hover:shadow-md transition-all duration-300"
+          style={{
+            backgroundColor: themeColors.surface,
+            borderColor: themeColors.primary + "30",
+          }}
         >
-          <p className="text-sm sm:text-base" style={{ color: themeColors.textSecondary }}>
-            Bio: Passionate about technology and creativity. Loves to explore new ideas, build projects, and connect with like-minded people.
-        </p>
-          <p className="text-sm sm:text-base" style={{ color: themeColors.textSecondary }}>
-            Joined: 2023-01-15
-          </p>
+          <div className="flex items-center gap-3 mb-3">
+            <i
+              className="fas fa-user text-lg"
+              style={{ color: themeColors.primary }}
+            ></i>
+            <p
+              className="text-base font-medium"
+              style={{ color: themeColors.text }}
+            >
+              Exploring tech & creativity — building ideas, learning, and
+              connecting.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <i
+              className="fas fa-calendar-alt text-lg"
+              style={{ color: themeColors.primary }}
+            ></i>
+            <p
+              className="text-sm sm:text-base"
+              style={{ color: themeColors.textSecondary }}
+            >
+              Joined <span className="font-semibold">January 15, 2023</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

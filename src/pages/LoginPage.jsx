@@ -14,6 +14,7 @@ export default function LoginPage() {
   const { setIsloggedIn } = useContext(AuthContext);
   const { themeColors } = useTheme();
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false); 
 
   const { handleSubmit, register, formState: { errors } } = useForm({
     defaultValues: { email: '', password: '' },
@@ -23,22 +24,20 @@ export default function LoginPage() {
   const { mutate: handleloginUser, isLoading, isError } = useMutation({
     mutationFn: (data) => loginUser(data),
     onSuccess: (data) => {
-        localStorage.setItem('token', data.data.token);
-        setIsloggedIn(true);
-        navigator('/');
+      localStorage.setItem('token', data.data.token);
+      setIsloggedIn(true);
+      navigator('/');
     },
     onError: (error) => {
-        console.log(error);
-        setLoginErrorMessage(error.response?.data?.message || error.message);
-        setIsloggedIn(false);
-        localStorage.removeItem('token');
+      console.log(error);
+      setLoginErrorMessage(error.response?.data?.message || error.message);
+      setIsloggedIn(false);
+      localStorage.removeItem('token');
     }
-  })
+  });
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-8 relative">
-      
-
       {/* Decorative Elements */}
       <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-8 blur-sm"
            style={{ backgroundColor: themeColors.primary }}></div>
@@ -58,6 +57,7 @@ export default function LoginPage() {
                 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-2 sm:mb-4 tracking-tight"
                 style={{ color: themeColors.primary }}
               >
+                <i className="fa-solid fa-link pe-12 text-4xl sm:text-6xl lg:text-6xl "></i> 
                 Linkup
               </h1>
               <div 
@@ -122,7 +122,7 @@ export default function LoginPage() {
                     classNames={{
                       input: "custom-input",
                       inputWrapper: `custom-input-wrapper ${Boolean(errors.email?.message) ? 'is-invalid' : ''}`,
-                      label: "text-gray-700",
+                      label: "text-gray-300",
                       errorMessage: "text-red-500"
                     }}
                     {...register('email')}
@@ -133,25 +133,35 @@ export default function LoginPage() {
                   ></div>
                 </div>
 
+                {/* Password Field with Toggle */}
                 <div className="relative">
                   <Input
                     size="lg"
                     isInvalid={Boolean(errors.password?.message)}
                     errorMessage={errors.password?.message}
                     label="Password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     classNames={{
                       input: "custom-input",
                       inputWrapper: `custom-input-wrapper ${Boolean(errors.password?.message) ? 'is-invalid' : ''}`,
-                      label: "text-gray-700",
+                      label: "text-gray-300",
                       errorMessage: "text-red-500"
                     }}
                     {...register('password')}
                   />
-                  <div 
-                    className="absolute top-3 right-3 w-2 h-2 rounded-full opacity-60"
-                    style={{ backgroundColor: themeColors.primary }}
-                  ></div>
+                  
+                  {/*  Toggle Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute top-1/2 right-5  -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                  >
+                    {showPassword ? (
+                      <i className="fa-solid fa-eye-slash"></i>
+                    ) : (
+                      <i className="fa-solid fa-eye"></i>
+                    )}
+                  </button>
                 </div>
 
                 <Button
@@ -176,7 +186,7 @@ export default function LoginPage() {
                       color: themeColors.primary
                     }}
                   >
-                    {loginErrorMessage}
+                    Email or password is incorrect, please try again.
                   </div>
                 )}
 

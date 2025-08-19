@@ -62,7 +62,7 @@ export default function NavbarComponent() {
             className="font-bold text-xl sm:text-2xl transition-all duration-300"
             style={{ color: themeColors.primary }}
             to="/"
-          >
+          ><i class="fa-solid fa-link pe-8"></i> 
             Linkup
           </Link>
         </div>

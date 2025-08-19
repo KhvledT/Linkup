@@ -217,7 +217,8 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
                   style={{ 
                     borderColor: errors.password ? '#EF4444' : undefined,
                     focusRingColor: themeColors.primary,
-                    backgroundColor: themeColors.surface
+                    backgroundColor: themeColors.surface,
+                    color: themeColors.text
                   }}
                   placeholder="Enter your current password"
                 />
@@ -253,7 +254,8 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
                   style={{ 
                     borderColor: errors.newPassword ? '#EF4444' : undefined,
                     focusRingColor: themeColors.primary,
-                    backgroundColor: themeColors.surface
+                    backgroundColor: themeColors.surface,
+                    color: themeColors.text
                   }}
                   placeholder="Enter your new password"
                 />
@@ -289,7 +291,8 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
                   style={{ 
                     borderColor: errors.confirmPassword ? '#EF4444' : undefined,
                     focusRingColor: themeColors.primary,
-                    backgroundColor: themeColors.surface
+                    backgroundColor: themeColors.surface,
+                    color: themeColors.text
                   }}
                   placeholder="Confirm your new password"
                 />
