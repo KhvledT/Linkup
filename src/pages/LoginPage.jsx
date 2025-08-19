@@ -1,44 +1,83 @@
+// Import HeroUI components for consistent UI design
 import { Button, Input } from '@heroui/react';
+
+// Import React Hook Form for form state management
 import { useForm } from 'react-hook-form';
+
+// Import Zod resolver for form validation
 import { zodResolver } from '@hookform/resolvers/zod';
+
+// Import login validation schema
 import { loginSchema } from '../schema/LoginSchama';
+
+// Import authentication service for API calls
 import { loginUser } from "../Services/AuthService";
+
+// Import React hooks for context and state management
 import { useContext, useState } from 'react';
+
+// Import React Router components for navigation
 import { Link, useNavigate } from 'react-router-dom';
+
+// Import context providers for authentication and theming
 import { AuthContext } from '../Contexts/AuthContext.jsx';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
+
+// Import React Query for server state management
 import { useMutation } from '@tanstack/react-query';
 
+// Login page component for user authentication
+// Features a beautiful design with form validation and error handling
 export default function LoginPage() {
+  // Navigation function for routing after successful login
   const navigator = useNavigate();
+  
+  // Authentication context for managing login state
   const { setIsloggedIn } = useContext(AuthContext);
+  
+  // Theme context for dynamic styling
   const { themeColors } = useTheme();
+  
+  // Local state for displaying login error messages
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
+  
+  // Local state for password visibility toggle
   const [showPassword, setShowPassword] = useState(false); 
 
+  // React Hook Form setup with Zod validation
+  // Provides form state management and validation
   const { handleSubmit, register, formState: { errors } } = useForm({
     defaultValues: { email: '', password: '' },
     resolver: zodResolver(loginSchema)
   });
 
+  // React Query mutation for user login
+  // Handles API calls, loading states, and success/error handling
   const { mutate: handleloginUser, isLoading, isError } = useMutation({
     mutationFn: (data) => loginUser(data),
     onSuccess: (data) => {
+      // Store authentication token in localStorage
       localStorage.setItem('token', data.data.token);
+      // Update global authentication state
       setIsloggedIn(true);
+      // Navigate to home page after successful login
       navigator('/');
     },
     onError: (error) => {
-      console.log(error);
+      // Handle login error and display user-friendly message
       setLoginErrorMessage(error.response?.data?.message || error.message);
+      // Reset authentication state on error
       setIsloggedIn(false);
+      // Remove invalid token from localStorage
       localStorage.removeItem('token');
     }
   });
 
   return (
+    // Main container with full-screen height and centered content
     <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-8 relative">
-      {/* Decorative Elements */}
+      {/* Decorative Background Elements */}
+      {/* Floating shapes that add visual interest to the background */}
       <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-8 blur-sm"
            style={{ backgroundColor: themeColors.primary }}></div>
       <div className="absolute top-20 right-16 w-16 h-16 transform rotate-45 opacity-6"
@@ -47,12 +86,17 @@ export default function LoginPage() {
            style={{ backgroundColor: themeColors.primary }}></div>
       
       {/* Main Content Container */}
+      {/* Wrapper for the main content with proper z-index layering */}
       <div className="relative z-10 w-full max-w-4xl">
+        {/* Two-column grid layout for branding and form */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           
-          {/* Left Side - Branding */}
+          {/* Left Side - Branding Section */}
+          {/* Company branding with logo, tagline, and decorative elements */}
           <div className="text-center lg:text-left space-y-4 sm:space-y-6">
+            {/* Logo container with decorative accent elements */}
             <div className="relative">
+              {/* Main company logo and name */}
               <h1 
                 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-2 sm:mb-4 tracking-tight"
                 style={{ color: themeColors.primary }}
@@ -60,16 +104,19 @@ export default function LoginPage() {
                 <i className="fa-solid fa-link pe-12 text-4xl sm:text-6xl lg:text-6xl "></i> 
                 Linkup
               </h1>
+              {/* Top-right decorative accent */}
               <div 
                 className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-8 sm:h-8 rounded-full opacity-60"
                 style={{ backgroundColor: themeColors.secondary }}
               ></div>
+              {/* Bottom-left decorative accent */}
               <div 
                 className="absolute -bottom-1 -left-1 sm:-bottom-2 sm:-left-2 w-3 h-3 sm:w-6 sm:h-6 transform rotate-45 opacity-60"
                 style={{ backgroundColor: themeColors.primary }}
               ></div>
             </div>
             
+            {/* Company tagline */}
             <p 
               className="text-lg sm:text-xl lg:text-2xl font-medium leading-relaxed max-w-lg"
               style={{ color: themeColors.text }}
@@ -77,7 +124,8 @@ export default function LoginPage() {
               Connect with friends and the world around you in a warm, vibrant community.
             </p>
             
-            {/* Decorative dots */}
+            {/* Decorative accent dots */}
+            {/* Small circular elements that add visual interest */}
             <div className="flex justify-center lg:justify-start space-x-2 mt-4 sm:mt-8">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div 
@@ -89,21 +137,26 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Right Side - Login Form */}
+          {/* Right Side - Login Form Section */}
+          {/* User authentication form with decorative elements */}
           <div className="relative">
+            {/* Form container with white background and shadow */}
             <div 
               className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl border border-gray-200"
             >
-              {/* Form decorative elements */}
+              {/* Form decorative accent elements */}
+              {/* Top-right circular accent */}
               <div 
                 className="absolute -top-4 -right-4 w-8 h-8 rounded-full opacity-40"
                 style={{ backgroundColor: themeColors.primary }}
               ></div>
+              {/* Bottom-left square accent */}
               <div 
                 className="absolute -bottom-4 -left-4 w-6 h-6 transform rotate-45 opacity-40"
                 style={{ backgroundColor: themeColors.secondary }}
               ></div>
               
+              {/* Form title */}
               <h2 
                 className="text-3xl font-bold text-center mb-8"
                 style={{ color: themeColors.primary }}
@@ -111,7 +164,9 @@ export default function LoginPage() {
                 Welcome Back
               </h2>
 
+              {/* Login form with validation and error handling */}
               <form onSubmit={handleSubmit(handleloginUser)} className="space-y-6">
+                {/* Email input field */}
                 <div className="relative">
                   <Input
                     size="lg"
@@ -127,13 +182,14 @@ export default function LoginPage() {
                     }}
                     {...register('email')}
                   />
+                  {/* Decorative accent dot on email field */}
                   <div 
                     className="absolute top-3 right-3 w-2 h-2 rounded-full opacity-60"
                     style={{ backgroundColor: themeColors.primary }}
                   ></div>
                 </div>
 
-                {/* Password Field with Toggle */}
+                {/* Password input field with visibility toggle */}
                 <div className="relative">
                   <Input
                     size="lg"
@@ -150,7 +206,7 @@ export default function LoginPage() {
                     {...register('password')}
                   />
                   
-                  {/*  Toggle Button */}
+                  {/* Password visibility toggle button */}
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -164,6 +220,7 @@ export default function LoginPage() {
                   </button>
                 </div>
 
+                {/* Submit button for form submission */}
                 <Button
                   loading={isLoading}
                   size="lg"
@@ -177,6 +234,8 @@ export default function LoginPage() {
                   Log In
                 </Button>
 
+                {/* Error message display */}
+                {/* Shows when login credentials are incorrect */}
                 {isError && (
                   <div 
                     className="p-4 rounded-xl text-center font-semibold text-lg border-2"
@@ -190,6 +249,7 @@ export default function LoginPage() {
                   </div>
                 )}
 
+                {/* Registration link for new users */}
                 <div className="text-center pt-4">
                   <Link 
                     to="/register" 
