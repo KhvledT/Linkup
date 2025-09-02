@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPost } from '../Services/FeedServices';
-import { addToast } from '@heroui/react';
+import toast from 'react-hot-toast';
 import { useMutation } from '@tanstack/react-query';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 import { queryClient } from '../App.jsx';
@@ -13,9 +13,19 @@ export default function CreatePost() {
   const [image, setImage] = useState(null);
 
   const handleRemoveImage = () => {
+    if (imagePreview) {
+      try { URL.revokeObjectURL(imagePreview); } catch {}
+    }
     setImagePreview('');
     setImage(null);
-    document.getElementById('imageInput').value = null;
+    const input = document.getElementById('imageInput');
+    if (input) input.value = null;
+  };
+
+  const resetForm = () => {
+    setBody('');
+    handleRemoveImage();
+    setShowForm(false);
   };
 
   const handleImageChange = (e) => {
@@ -27,7 +37,6 @@ export default function CreatePost() {
 
   const { mutate: handleSubmit, isPending } = useMutation({
     mutationFn: () => {
-      if (!body.trim() && !image) return;
       const formData = new FormData();
       if (body) formData.append('body', body);
       if (image) formData.append('image', image);
@@ -35,18 +44,25 @@ export default function CreatePost() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']); // Refetch feed تلقائي
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['userPosts'] });
+      }, 500);
       setShowForm(false);
       setBody('');
       handleRemoveImage();
-      addToast({ title: 'Post Created', timeout: 3000, color: 'success' });
+      toast.success('Post created');
     },
     onError: () => {
-      addToast({ title: 'Error Creating Post', timeout: 3000, color: 'danger' });
+      toast.error('Failed to create post');
     },
   });
 
   const handleReload = (e) => {
     e.preventDefault();
+    if (body.trim() === '' && !image) {
+      toast.error('Write something or add a photo');
+      return;
+    }
     handleSubmit();
   };
 
@@ -107,7 +123,7 @@ export default function CreatePost() {
                 type="button"
                 className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition duration-200 font-medium text-sm"
                 style={{ color: themeColors.textSecondary, backgroundColor: themeColors.primary + '10' }}
-                onClick={() => setShowForm(false)}
+                onClick={resetForm}
               >
                 <i className="fas fa-times mr-1 sm:mr-2 text-xs sm:text-sm sm:hidden"></i>
                 Cancel

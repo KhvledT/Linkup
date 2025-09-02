@@ -28,7 +28,7 @@ export default function UserPosts({userID}) {
                 <Post
                     post={post}
                     getUserPosts={refetch}
-                    commentLimit={post.comments?.length || 0}
+                    commentLimit={1}
                     from={'userProfilePage'}
                 />
             </div>

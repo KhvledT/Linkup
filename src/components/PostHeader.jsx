@@ -6,9 +6,17 @@ export default function PostHeader({post , fakePost , userID , handleEditPost , 
   const { themeColors } = useTheme();
   const navigate = useNavigate();
 
+  function handleUserClick() {
+    if(post?.user?._id === userID) {
+      navigate(`/profile`);
+    } else {
+      navigate(`/user-page/${post?._id}`);
+    }
+  }
+
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2 sm:gap-3 cursor-pointer" onClick={() => navigate(`/user-page/${post?._id}`)}>
+      <div className="flex items-center gap-2 sm:gap-3 cursor-pointer" onClick={handleUserClick}>
         <div className="relative">
           <img
             src={

@@ -11,6 +11,7 @@ import PostHeader from "./PostHeader";
 import PostStatistics from "./PostStatistics";
 import PostBtns from "./PostBtns";
 import PostImageModal from "./PostImageModal";
+import DeletePostConfirmModal from './DeletePostConfirmModal.jsx';
 
 // Import context providers for authentication and theming
 import { AuthContext } from "../Contexts/AuthContext";
@@ -19,6 +20,7 @@ import { useTheme } from '../Contexts/ThemeContext.jsx';
 // Import API services and utilities
 import { deletePost } from "../Services/FeedServices";
 import { useMutation } from "@tanstack/react-query";
+import toast from 'react-hot-toast';
 import { invalidateAndRefetch } from "../utils/queryUtils";
 
 // Import fallback profile image for users without profile pictures
@@ -57,6 +59,8 @@ export default function Post({
   
   // Local state for image modal visibility
   const [showImageModal, setShowImageModal] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   // Extract post ID from URL parameters if viewing post details
   if (getPostDetails) {
@@ -66,7 +70,7 @@ export default function Post({
   
   // React Query mutation for post deletion
   // Handles API calls, success/error handling, and cache invalidation
-  const { mutate: handleDeletePost } = useMutation({
+  const { mutate: performDeletePost, isPending: isDeletingPost } = useMutation({
     mutationFn: (postId) => deletePost(postId),
     onSuccess: () => {
       // Invalidate and refetch relevant data after successful deletion
@@ -75,12 +79,20 @@ export default function Post({
       // Navigate based on the source page context
       if (from === "PostDetailsPage") navigator('/');
       else if (from === "userProfilePage") getUserPosts(userID);
+      toast.success('Post deleted');
+      setIsDeleteModalOpen(false);
+      setPendingDeleteId(null);
     },
-    onError: (error) => {
-      // Handle post deletion error silently
-      // In production, you might want to show a user-friendly error message
+    onError: () => {
+      toast.error('Failed to delete post');
     }
   });
+
+  // Open confirm modal for delete
+  const handleDeletePost = (postId) => {
+    setPendingDeleteId(postId);
+    setIsDeleteModalOpen(true);
+  };
 
   // Navigate to edit post page for the specified post
   const handleEditPost = (postId) => {
@@ -99,7 +111,8 @@ export default function Post({
   };
 
   return (
-    // Main post container with rounded corners, shadows, and hover effects
+    <>
+    {/* Main post container with rounded corners, shadows, and hover effects */}
     <div
       className="rounded-2xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md border"
       style={{
@@ -214,5 +227,15 @@ export default function Post({
         />
       </div>
     </div>
+    {/* Delete Post Confirmation Modal */}
+      <DeletePostConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (pendingDeleteId) performDeletePost(pendingDeleteId);
+        }}
+        isDeleting={isDeletingPost}
+      />
+    </>
   );
 }

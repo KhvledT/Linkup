@@ -74,4 +74,4 @@ export const invalidatePosts = () => {
  */
 export const invalidatePostDetails = () => {
   queryClient.invalidateQueries(['postDetails']);
-};
+}

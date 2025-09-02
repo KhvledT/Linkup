@@ -53,7 +53,7 @@ export default function LoginPage() {
 
   // React Query mutation for user login
   // Handles API calls, loading states, and success/error handling
-  const { mutate: handleloginUser, isLoading, isError } = useMutation({
+  const { mutate: handleloginUser, isPending, isError } = useMutation({
     mutationFn: (data) => loginUser(data),
     onSuccess: (data) => {
       // Store authentication token in localStorage
@@ -209,8 +209,9 @@ export default function LoginPage() {
                   {/* Password visibility toggle button */}
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute top-1/2 right-5  -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
                       <i className="fa-solid fa-eye-slash"></i>
@@ -222,16 +223,26 @@ export default function LoginPage() {
 
                 {/* Submit button for form submission */}
                 <Button
-                  loading={isLoading}
                   size="lg"
                   type="submit"
-                  className="w-full text-lg font-semibold py-4 rounded-xl transition-all duration-300 hover:scale-105"
+                  isDisabled={isPending}
+                  className="w-full text-lg font-semibold py-4 rounded-xl transition-all duration-300 hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
                   style={{ 
                     backgroundColor: themeColors.primary,
                     color: "white"
                   }}
                 >
-                  Log In
+                  {isPending ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Logging in...</span>
+                    </div>
+                  ) : (
+                    'Log In'
+                  )}
                 </Button>
 
                 {/* Error message display */}

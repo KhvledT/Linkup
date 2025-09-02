@@ -28,6 +28,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 // Import toast notification component
 import { Toaster } from 'react-hot-toast'
+import { useTheme } from './Contexts/ThemeContext.jsx'
 
 // Create a new QueryClient instance for React Query
 // This manages server state, caching, and data synchronization
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
 // Main App component that wraps the entire application
 // Provides React Query context, routing, and global toast notifications
 export default function App() {
+  const { themeColors } = useTheme();
   return (
     // Wrap the app with QueryClientProvider for React Query functionality
     <QueryClientProvider client={queryClient}>
@@ -81,46 +83,41 @@ export default function App() {
       <RouterProvider router={router} />
       
       {/* Global toast notification system */}
-      {/* Configured with custom styling and positioning */}
       <Toaster
-          position="top-right"
-          reverseOrder={false}
-          toastOptions={{
-            // Custom styling for all toast notifications
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 2500,
+          style: {
+            borderRadius: '16px',
+            background: themeColors.surface,
+            color: themeColors.text,
+            padding: '12px 16px',
+            fontWeight: 500,
+            fontSize: '14px',
+            border: `1px solid ${themeColors.primary}20`,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+          },
+          success: {
             style: {
-              borderRadius: '12px',
-              background: '#1f2937', // Dark background
-              color: '#fff',          // White text
-              padding: '16px 24px',
-              fontWeight: 500,
-              fontSize: '14px',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-              backdropFilter: 'blur(6px)',
+              borderLeft: `4px solid ${themeColors.primary}`,
             },
-            // Success toast styling
-            success: {
-              style: {
-                background: '#10b981', // Green for success
-                color: '#fff',
-              },
-              iconTheme: {
-                primary: '#fff',
-                secondary: '#10b981',
-              },
+            iconTheme: {
+              primary: themeColors.primary,
+              secondary: '#ffffff',
             },
-            // Error toast styling
-            error: {
-              style: {
-                background: '#ef4444', // Red for errors
-                color: '#fff',
-              },
-              iconTheme: {
-                primary: '#fff',
-                secondary: '#ef4444',
-              },
+          },
+          error: {
+            style: {
+              borderLeft: `4px solid ${themeColors.secondary}`,
             },
-          }}
-        />
+            iconTheme: {
+              primary: themeColors.secondary,
+              secondary: '#ffffff',
+            },
+          },
+        }}
+      />
     </QueryClientProvider>
   )
 }

@@ -4,6 +4,7 @@ import { postDetails, updatePost } from '../Services/FeedServices';
 import LoadingPage from './LoadingPage';
 import { useMutation } from '@tanstack/react-query';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
+import toast from 'react-hot-toast';
 
 export default function EditPostPage () {
   const { themeColors } = useTheme();
@@ -39,8 +40,11 @@ export default function EditPostPage () {
       if (image) formData.append("image", image);
       return updatePost(formData, id);
     },
-    onSuccess: () => navigator(`/post-details/${id}`),
-    onError: (error) => console.error("Error updating post:", error),
+    onSuccess: () => {
+      toast.success('Post updated');
+      navigator(`/post-details/${id}`);
+    },
+    onError: () => toast.error('Failed to update post'),
   });
 
   const handleImageChange = (e) => {

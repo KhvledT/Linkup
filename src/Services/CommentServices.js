@@ -3,7 +3,7 @@ const BASE_URL = "https://linked-posts.routemisr.com/";
 
 
 export const createComment = (data) => {
-  axios.post(`${BASE_URL}comments`, data, {
+  return axios.post(`${BASE_URL}comments`, data, {
         headers: {
           token: localStorage.getItem("token"),
         },

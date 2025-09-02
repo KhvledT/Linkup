@@ -31,6 +31,8 @@ export default function FeedPage() {
     getNextPageParam: (lastPage, allPages) =>
       lastPage.data.posts.length < 50 ? undefined : allPages.length + 1,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
     staleTime: 15000,
   });
 
@@ -64,6 +66,7 @@ export default function FeedPage() {
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [loadMoreRef, hasNextPage, fetchNextPage]);
+  
 
   // Refetch when location changes to FeedPage
   useEffect(() => {

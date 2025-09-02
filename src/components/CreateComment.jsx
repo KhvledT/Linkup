@@ -9,6 +9,7 @@ import { createComment } from '../Services/CommentServices';
 
 // Import React Query for server state management
 import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 // Import theme context for dynamic styling
 import { useTheme } from '../Contexts/ThemeContext.jsx';
@@ -32,12 +33,15 @@ export default function CreateComment({ postId }) {
     onSuccess: () => {
       // Invalidate and refetch posts to show the new comment
       queryClient.invalidateQueries(['posts']);
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['userPosts'] });
+      }, 500);
       // Clear the comment input after successful submission
       setContent('');
+      toast.success('Comment posted');
     },
     onError: (error) => {
-      // Handle comment creation error silently
-      // In production, you might want to show a user-friendly error message
+      toast.error('Failed to post comment');
     },
   });
 
@@ -48,7 +52,7 @@ export default function CreateComment({ postId }) {
     if (!content.trim()) return;
     
     // Submit comment with content and post ID
-    handleSubmit({ content, post: postId });
+    handleSubmit({ content: content.trim(), post: postId });
   };
 
   return (
@@ -67,7 +71,7 @@ export default function CreateComment({ postId }) {
             base: 'w-full',
           }}
           // Handle Enter key press for quick comment submission
-          onKeyPress={(e) => {
+          onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
               handleCommentSubmit();
@@ -78,25 +82,21 @@ export default function CreateComment({ postId }) {
       {/* Submit button with loading state and dynamic styling */}
       <Button
         onPress={handleCommentSubmit}
-        isLoading={isPending}
-        isDisabled={!content.trim()}
+        isDisabled={!content.trim() || isPending}
         size="md"
         className="h-12 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105"
         style={{ backgroundColor: themeColors.primary, color: 'white' }}
       >
-        {/* Show loading state with spinner and text */}
         {isPending ? (
-          <div className="flex items-center gap-2">
-            {/* Loading spinner SVG animation */}
-            <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <div className="flex items-center justify-center space-x-2">
+            <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Posting...
+            <span>Commenting...</span>
           </div>
         ) : (
-          // Default button text
-          'Post'
+          'Comment'
         )}
       </Button>
     </div>

@@ -6,8 +6,10 @@ import { deleteComment, updateComment } from '../Services/CommentServices';
 import CommentHeader from './CommentHeader';
 import CommentEditBox from './CommentEditBox';
 import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 import { queryClient } from '../App.jsx';
+import DeleteCommentConfirmModal from './DeleteCommentConfirmModal.jsx';
 
 export default function Comments({ post, commentLimit }) {
   const { themeColors } = useTheme();
@@ -15,23 +17,45 @@ export default function Comments({ post, commentLimit }) {
   const [editComment, setEditComment] = useState(null); 
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [commentIdToDelete, setCommentIdToDelete] = useState(null);
 
   // Delete comment mutation
-  const { mutate: handleDeleteComment } = useMutation({
+  const { mutate: performDeleteComment, isPending: isDeletingComment } = useMutation({
     mutationFn: (commentId) => deleteComment(commentId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['posts']); // Refetch feed تلقائي بعد حذف الكومنت
+      queryClient.invalidateQueries(['posts']);
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['userPosts'] });
+      }, 500);
+      setIsDeleteModalOpen(false);
+      setCommentIdToDelete(null);
+      toast.success('Comment deleted');
     },
+    onError: () => toast.error('Failed to delete comment'),
   });
+
+  function openDeleteConfirm(commentId) {
+    setCommentIdToDelete(commentId);
+    setIsDeleteModalOpen(true);
+  }
 
   // Edit comment mutation
   const { mutate: handleEditComment } = useMutation({
     mutationFn: ({ commentId, content }) => updateComment(commentId, { content }),
+    onMutate: () => {
+      setIsSubmitting(true);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']); // Refetch feed بعد تعديل الكومنت
       setIsSubmitting(false);
       setEditComment(null);
       setCommentText('');
+      toast.success('Comment updated');
+    },
+    onError: () => {
+      setIsSubmitting(false);
+      toast.error('Failed to update comment');
     },
   });
 
@@ -65,7 +89,7 @@ export default function Comments({ post, commentLimit }) {
                   {comment.commentCreator._id === userID && (
                     <DropDown
                       commentId={comment._id}
-                      handleDeleteComment={handleDeleteComment}
+                      handleDeleteComment={openDeleteConfirm}
                       editCommentPreview={() => editCommentPreview(comment._id, comment.content)}
                       Type="comment"
                     />
@@ -88,6 +112,16 @@ export default function Comments({ post, commentLimit }) {
             ))}
         </div>
       )}
+
+      {/* Delete Comment Confirmation Modal */}
+      <DeleteCommentConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (commentIdToDelete) performDeleteComment(commentIdToDelete);
+        }}
+        isDeleting={isDeletingComment}
+      />
     </>
   );
 }

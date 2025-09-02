@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Contexts/AuthContext.jsx";
 import { useTheme } from '../Contexts/ThemeContext.jsx';
+import LogoutConfirmModal from './LogoutConfirmModal.jsx';
+import toast from 'react-hot-toast';
 
 export const AcmeLogo = () => {
   return (
@@ -23,6 +25,7 @@ export default function NavbarComponent() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // هذا useEffect لتحديث حالة profilePageIsOpen حسب الصفحة الحالية
   useEffect(() => {
@@ -40,7 +43,11 @@ export default function NavbarComponent() {
     setUserID('');
     setProfilePageIsOpen(false);
     navigate('/login');
+    toast.success('Logged out');
   };
+
+  const openLogoutConfirm = () => setIsLogoutModalOpen(true);
+  const closeLogoutConfirm = () => setIsLogoutModalOpen(false);
 
   const handleLogin = () => {
     navigate('/login');
@@ -114,7 +121,7 @@ export default function NavbarComponent() {
       <NavbarContent className="hidden sm:flex" justify="end">
         {isloggedIn ? (
           <Button 
-            onPress={handleLogout} 
+            onPress={openLogoutConfirm} 
             className="font-semibold px-3 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl text-sm sm:text-base"
             style={{ 
               backgroundColor: themeColors.primary,
@@ -189,7 +196,7 @@ export default function NavbarComponent() {
                 onClick={(e) => {
                   e.preventDefault();
                   setIsMenuOpen(false);
-                  handleLogout();
+                  openLogoutConfirm();
                 }}
                 className="w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center gap-3"
                 style={{ color: themeColors.text }}
@@ -230,6 +237,15 @@ export default function NavbarComponent() {
           </>
         )}
       </NavbarMenu>
+      {/* Logout Confirm Modal */}
+      <LogoutConfirmModal 
+        isOpen={isLogoutModalOpen}
+        onClose={closeLogoutConfirm}
+        onConfirm={() => {
+          closeLogoutConfirm();
+          handleLogout();
+        }}
+      />
     </Navbar>
   );
 }

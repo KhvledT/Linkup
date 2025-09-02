@@ -8,14 +8,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Contexts/AuthContext.jsx';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
   const navigator = useNavigate();
   const { setIsloggedIn } = useContext(AuthContext);
   const { themeColors } = useTheme();
-  const [showPassword, setShowPassword] = useState(false); // ✅ toggle state
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRePassword, setShowRePassword] = useState(false);
 
   const { handleSubmit, register, formState: { errors }, watch } = useForm({
     defaultValues: {
@@ -31,18 +31,16 @@ export default function RegisterPage() {
 
   const watchedGender = watch('gender');
 
-  const {mutate : handleRegister, isLoading  } = useMutation({
+  const {mutate : handleRegister, isPending  } = useMutation({
     mutationFn: (data) => registerUser(data),
     onSuccess: (data) => {
-      setSuccess("Account created successfully!");
-      setError('');
+      toast.success('Account created successfully!', { duration: 7000 });
       setTimeout(() => {
         navigator('/login');
       }, 2000);
     },
     onError: (error) => {
-      setSuccess('');
-      setError(error.response.data.error);
+      toast.error(error?.response?.data?.error || 'Registration failed', { duration: 7000 });
       setIsloggedIn(false);
       localStorage.removeItem('token');
     }
@@ -183,8 +181,9 @@ export default function RegisterPage() {
                 {/*  Toggle Button */}
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute top-1/2 right-5  -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
                       <i className="fa-solid fa-eye-slash"></i>
@@ -200,7 +199,7 @@ export default function RegisterPage() {
                   isInvalid={Boolean(errors.rePassword?.message)}
                   errorMessage={errors.rePassword?.message}
                   label="Confirm Password"
-                  type={showPassword ? "text" : "password"}
+                  type={showRePassword ? "text" : "password"}
                   classNames={{
                     input: "custom-input",
                     inputWrapper: `custom-input-wrapper ${Boolean(errors.rePassword?.message) ? 'is-invalid' : ''}`,
@@ -212,10 +211,11 @@ export default function RegisterPage() {
                 {/*  Toggle Button */}
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowRePassword((prev) => !prev)}
                     className="absolute top-1/2 right-5  -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                    aria-label={showRePassword ? "Hide confirm password" : "Show confirm password"}
                   >
-                    {showPassword ? (
+                    {showRePassword ? (
                       <i className="fa-solid fa-eye-slash"></i>
                     ) : (
                       <i className="fa-solid fa-eye"></i>
@@ -278,43 +278,29 @@ export default function RegisterPage() {
             </div>
 
             <Button
-              loading={isLoading}
               size="lg"
               type="submit"
-              className="w-full text-lg font-semibold py-4 rounded-xl transition-all duration-300 hover:scale-105 mt-8"
+              isDisabled={isPending}
+              className="w-full text-lg font-semibold py-4 rounded-xl transition-all duration-300 hover:scale-105 mt-8 disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ 
                 backgroundColor: themeColors.primary,
                 color: "white"
               }}
             >
-              Create Account
+              {isPending ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Creating...</span>
+                </div>
+              ) : (
+                'Create Account'
+              )}
             </Button>
 
-            {success && (
-              <div 
-                className="p-4 rounded-xl text-center font-semibold text-lg border-2"
-                style={{ 
-                  backgroundColor: `${themeColors.primary}10`,
-                  borderColor: themeColors.primary,
-                  color: themeColors.primary
-                }}
-              >
-                {success}
-              </div>
-            )}
             
-            {error && (
-              <div 
-                className="p-4 rounded-xl text-center font-semibold text-lg border-2"
-                style={{ 
-                  backgroundColor: `${themeColors.primary}10`,
-                  borderColor: themeColors.primary,
-                  color: themeColors.primary
-                }}
-              >
-                {error}
-              </div>
-            )}
 
             <div className="text-center pt-6">
               <p 

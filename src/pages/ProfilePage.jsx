@@ -1,22 +1,24 @@
 import React, { useContext, useRef, useState } from "react";
-import { getUserDetails, UploadUserImage } from "../Services/UserDetailsServices";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { getUserDetails } from "../Services/UserDetailsServices";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import LoadingPage from "./LoadingPage";
 import ErrorMessage from "../components/ErrorMessage";
 import FetchingIcon from "../components/FetchingIcon";
 import ProfilePictureModal from "../components/ProfilePictureModal";
+import ChangeProfilePictureModal from "../components/ChangeProfilePictureModal.jsx";
 import SettingsModal from "../components/SettingsModal";
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 import UserPosts from "../components/UserPosts.jsx";
 import { AuthContext } from "../Contexts/AuthContext.jsx";
+import { queryClient } from "../App.jsx";
 
 export default function ProfilePage() {
-  const fileInputRef = useRef(null);
   const { themeColors } = useTheme();
   const navigate = useNavigate();
   const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isChangeProfilePictureModalOpen, setIsChangeProfilePictureModalOpen] = useState(false);
   const { userID } = useContext(AuthContext);
   
 
@@ -30,23 +32,7 @@ export default function ProfilePage() {
     staleTime: 30000,
   });
 
-  const { mutate: handleChangeImage, isLoading: isUploading } = useMutation({
-    mutationFn: (data) => {
-      return UploadUserImage(data);
-    },
-    onSuccess: () => {
-      refetch();
-    },
-  });
-
-  function handleImage(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("photo", file);
-    handleChangeImage(formData);
-  }
+  // Direct upload flow removed; handled inside ChangeProfilePictureModal
 
   const handleProfilePictureClick = () => {
     setIsProfilePictureModalOpen(true);
@@ -54,6 +40,10 @@ export default function ProfilePage() {
 
   const handleSettingsClick = () => {
     setIsSettingsModalOpen(true);
+  };
+
+  const handleCameraClick = () => {
+    setIsChangeProfilePictureModalOpen(true);
   };
 
   return (
@@ -94,47 +84,17 @@ export default function ProfilePage() {
                style={{ borderColor: themeColors.primary }}
                onClick={handleProfilePictureClick}
              />
-             {/* Hidden File Input */}
-             <input
-               type="file"
-               accept="image/*"
-               ref={fileInputRef}
-               className="hidden"
-               onChange={handleImage}
-             />
              {/* Edit Icon */}
              <button
-               onClick={() => fileInputRef.current.click()}
+               onClick={handleCameraClick}
                className="absolute -bottom-1 -right-1 p-2.5 rounded-full shadow-md transition-all duration-300 hover:scale-110"
                style={{ 
                  backgroundColor: themeColors.primary,
                  color: "white"
                }}
-               disabled={isUploading}
+               
              >
-               {isUploading ? (
-                 <svg
-                   className="animate-spin h-3.5 w-3.5"
-                   fill="none"
-                   viewBox="0 0 24 24"
-                 >
-                   <circle
-                     className="opacity-25"
-                     cx="12"
-                     cy="12"
-                     r="10"
-                     stroke="currentColor"
-                     strokeWidth="4"
-                   ></circle>
-                   <path
-                     className="opacity-75"
-                     fill="currentColor"
-                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                   ></path>
-                 </svg>
-               ) : (
-                 <i className="fas fa-camera text-sm"></i>
-               )}
+               <i className="fas fa-camera text-sm"></i>
              </button>
            </div>
 
@@ -230,6 +190,13 @@ export default function ProfilePage() {
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
+      />
+
+      {/* Change Profile Picture Modal */}
+      <ChangeProfilePictureModal 
+        isOpen={isChangeProfilePictureModalOpen}
+        onClose={() => setIsChangeProfilePictureModalOpen(false)}
+        currentImageUrl={data?.data.user.photo}
       />
 
       {/* User Posts */}
