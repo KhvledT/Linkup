@@ -11,7 +11,6 @@ import SettingsModal from "../components/SettingsModal";
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 import UserPosts from "../components/UserPosts.jsx";
 import { AuthContext } from "../Contexts/AuthContext.jsx";
-import { queryClient } from "../App.jsx";
 
 export default function ProfilePage() {
   const { themeColors } = useTheme();

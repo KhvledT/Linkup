@@ -14,9 +14,6 @@ export const getAllPosts = (page = 1) => {
   });
 };
 
-
-
-
 export const postDetails = (id) => {
   return axios.get(`${BASE_URL}posts/${id}`, {
       headers: {

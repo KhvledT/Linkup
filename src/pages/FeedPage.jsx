@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
