@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { postDetails} from '../Services/FeedServices';
 import Post from '../components/Post'
@@ -54,7 +54,7 @@ export default function PostDetailsPage() {
         
         <ErrorMessage error={error} refetch={refetch} />
         :
-        <Post post={data?.data.post} getPostDetails={refetch} commentLimit={data?.data.post.comments.length} id={id} from={'PostDetailsPage'} />
+        <Post post={data?.data?.data?.post} getPostDetails={refetch} commentLimit={data?.data?.data?.post?.commentsCount ?? 0} id={id} from={'PostDetailsPage'} />
         }
     </div>
   )

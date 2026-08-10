@@ -29,9 +29,11 @@ export default function CreateComment({ postId }) {
   // React Query mutation for comment creation
   // Handles API calls, loading states, and success/error handling
   const { mutate: handleSubmit, isPending } = useMutation({
-    mutationFn: (commentData) => createComment(commentData),
+    mutationFn: (commentData) => createComment(postId, commentData),
     onSuccess: () => {
       // Invalidate and refetch posts to show the new comment
+      queryClient.invalidateQueries(['postComments', postId]);
+      if (postId) queryClient.invalidateQueries(['postDetails', postId]);
       queryClient.invalidateQueries(['posts']);
       setTimeout(() => {
         queryClient.refetchQueries({ queryKey: ['userPosts'] });
@@ -40,7 +42,7 @@ export default function CreateComment({ postId }) {
       setContent('');
       toast.success('Comment posted');
     },
-    onError: (error) => {
+    onError: () => {
       toast.error('Failed to post comment');
     },
   });
@@ -51,8 +53,8 @@ export default function CreateComment({ postId }) {
     // Don't submit empty or whitespace-only comments
     if (!content.trim()) return;
     
-    // Submit comment with content and post ID
-    handleSubmit({ content: content.trim(), post: postId });
+    // Submit comment with content
+    handleSubmit({ content: content.trim() });
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
@@ -28,23 +28,36 @@ export default function FeedPage() {
   } = useInfiniteQuery({
     queryKey: ['posts'],
     queryFn: ({ pageParam = 1 }) => getAllPosts(pageParam),
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.data.posts.length < 50 ? undefined : allPages.length + 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const posts = lastPage?.data?.data?.posts || [];
+      return posts.length < 50 ? undefined : allPages.length + 1;
+    },
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
     refetchOnMount: true,
     staleTime: 15000,
   });
 
+  // `data` is undefined until the first successful fetch and stays undefined when the API
+  // rejects (bad/expired token, network error). Never crash on `data.pages`.
+  const pages = data?.pages ?? [];
+
   async function getUserID() {
     if (localStorage.getItem('userID')) {
       setUserID(localStorage.getItem('userID'));
-    } else {
-      const userID = await getUserDetails();
-      if (userID.data.user._id) {
-        setUserID(userID.data.user._id);
-        localStorage.setItem('userID', userID.data.user._id);
+      return;
+    }
+    try {
+      const res = await getUserDetails();
+      const id = res?.data?.data?.user?._id;
+      if (id) {
+        setUserID(id);
+        localStorage.setItem('userID', id);
       }
+    } catch (err) {
+      // Non-fatal: the feed must still render if the profile bootstrap fails
+      // (e.g. transient token issue) — the error UI above covers the feed itself.
+      console.error('Failed to bootstrap userID:', err);
     }
   }
 
@@ -70,7 +83,7 @@ export default function FeedPage() {
 
   // Refetch when location changes to FeedPage
   useEffect(() => {
-    if (location.pathname === '/feed') {
+    if (location.pathname === '/') {
       refetch();
     }
   }, [location.pathname, refetch]);
@@ -89,13 +102,12 @@ export default function FeedPage() {
           <ErrorMessage error={error} refetch={refetch} />
         ) : (
           <>
-            {data.pages.map((page, i) => (
+            {pages.map((page, i) => (
               <div key={i} className="space-y-3">
-                {page.data.posts.map((post) => (
+                {(page?.data?.data?.posts ?? []).map((post) => (
                   <Post
                     key={post?._id}
                     post={post}
-                    postId={post?._id}
                     commentLimit={1}
                     from={'feedPage'}
                   />

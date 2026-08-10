@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 
-export default function PostStatistics({post , fakePost , handlePostClick}) {
+export default function PostStatistics({ post, handlePostClick }) {
   const { themeColors } = useTheme();
 
   return (
@@ -21,7 +21,7 @@ export default function PostStatistics({post , fakePost , handlePostClick}) {
             className="text-xs sm:text-sm font-medium"
             style={{ color: themeColors.textSecondary }}
           >
-            {fakePost.likes}
+            {post?.likesCount ?? 0}
           </span>
         </div>
         
@@ -29,14 +29,14 @@ export default function PostStatistics({post , fakePost , handlePostClick}) {
           className="text-xs sm:text-sm font-medium"
           style={{ color: themeColors.textSecondary }}
         >
-          {post?.comments?.length || 0} Comments
+          {post?.commentsCount ?? 0} Comments
         </span>
         
         <span 
           className="text-xs sm:text-sm font-medium"
           style={{ color: themeColors.textSecondary }}
         >
-          {fakePost.shares} Shares
+          {post?.sharesCount ?? 0} Shares
         </span>
       </div>
     </div>

@@ -9,10 +9,10 @@ export default function CommentHeader({comment , fakeCommentPhoto}) {
       {/* BackEnd Problem */}
           <img
             src={
-              typeof comment.commentCreator?.photo === 'string' ||
-              comment.commentCreator.photo.includes('undefined')
-                ? fakeCommentPhoto
-                : comment.commentCreator?.photo || fakeCommentPhoto
+              typeof comment.commentCreator?.photo === 'string' &&
+              !comment.commentCreator.photo.includes('undefined')
+                ? comment.commentCreator.photo
+                : fakeCommentPhoto
             }
             alt="User Avatar"
             className="w-10 h-10 rounded-full border"

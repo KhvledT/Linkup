@@ -2,10 +2,10 @@ import React, { useContext, useState } from 'react';
 import fakeCommentPhoto from '../../public/FakeProfileImage.png';
 import DropDown from './DropDown';
 import { AuthContext } from '../Contexts/AuthContext';
-import { deleteComment, updateComment } from '../Services/CommentServices';
+import { deleteComment, updateComment, getPostComments } from '../Services/CommentServices';
 import CommentHeader from './CommentHeader';
 import CommentEditBox from './CommentEditBox';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 import { queryClient } from '../App.jsx';
@@ -19,12 +19,24 @@ export default function Comments({ post, commentLimit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [commentIdToDelete, setCommentIdToDelete] = useState(null);
+  const postId = post?._id;
+
+  // Fetch comments for this post from the API
+  const { data: commentsData } = useQuery({
+    queryKey: ['postComments', postId],
+    queryFn: () => getPostComments(postId),
+    enabled: !!postId,
+    refetchOnWindowFocus: false,
+  });
+  const comments = commentsData?.data?.data?.comments || [];
 
   // Delete comment mutation
   const { mutate: performDeleteComment, isPending: isDeletingComment } = useMutation({
-    mutationFn: (commentId) => deleteComment(commentId),
+    mutationFn: (commentId) => deleteComment(postId, commentId),
     onSuccess: () => {
+      queryClient.invalidateQueries(['postComments', postId]);
       queryClient.invalidateQueries(['posts']);
+      if (postId) queryClient.invalidateQueries(['postDetails', postId]);
       setTimeout(() => {
         queryClient.refetchQueries({ queryKey: ['userPosts'] });
       }, 500);
@@ -42,12 +54,14 @@ export default function Comments({ post, commentLimit }) {
 
   // Edit comment mutation
   const { mutate: handleEditComment } = useMutation({
-    mutationFn: ({ commentId, content }) => updateComment(commentId, { content }),
+    mutationFn: ({ commentId, content }) => updateComment(postId, commentId, { content }),
     onMutate: () => {
       setIsSubmitting(true);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(['postComments', postId]);
       queryClient.invalidateQueries(['posts']); // Refetch feed بعد تعديل الكومنت
+      if (postId) queryClient.invalidateQueries(['postDetails', postId]);
       setIsSubmitting(false);
       setEditComment(null);
       setCommentText('');
@@ -66,7 +80,7 @@ export default function Comments({ post, commentLimit }) {
 
   return (
     <>
-      {post?.comments?.length > 0 && (
+      {comments.length > 0 && (
         <div
           className="max-w-2xl mx-auto rounded-xl p-2 border"
           style={{ backgroundColor: themeColors.surface, borderColor: themeColors.primary + '20' }}
@@ -78,11 +92,11 @@ export default function Comments({ post, commentLimit }) {
             Comments
           </h2>
 
-          {post.comments
+          {comments
             .slice(0, commentLimit)
             .reverse()
-            .map((comment, index) => (
-              <div key={index} className="mb-4 pb-3 border-b last:border-b-0" style={{ borderColor: themeColors.primary + '10' }}>
+            .map((comment) => (
+              <div key={comment._id} className="mb-4 pb-3 border-b last:border-b-0" style={{ borderColor: themeColors.primary + '10' }}>
                 <div className="flex items-start justify-between space-x-3 rtl:space-x-reverse">
                   <CommentHeader comment={comment} fakeCommentPhoto={fakeCommentPhoto} />
 

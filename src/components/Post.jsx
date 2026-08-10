@@ -2,7 +2,7 @@
 import { useContext, useState } from "react";
 
 // Import React Router hooks for navigation and URL parameters
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Import component dependencies
 import Comments from "./Comments";
@@ -42,7 +42,6 @@ export default function Post({
   getPostDetails,          // Function to fetch post details
   getPosts,                // Function to fetch posts list
   getUserPosts,            // Function to fetch user posts
-  postId,                  // Post ID for identification
   from                     // Source page identifier for navigation logic
 }) {
   // Get user ID from authentication context
@@ -62,12 +61,6 @@ export default function Post({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  // Extract post ID from URL parameters if viewing post details
-  if (getPostDetails) {
-    const { id } = useParams();
-    postId = id;
-  }
-  
   // React Query mutation for post deletion
   // Handles API calls, success/error handling, and cache invalidation
   const { mutate: performDeletePost, isPending: isDeletingPost } = useMutation({
@@ -183,7 +176,7 @@ export default function Post({
         className="px-3 sm:px-4 lg:px-5 py-2 sm:py-3 border-b"
         style={{ borderColor: themeColors.primary + '10' }}
       >
-        <PostStatistics post={post} fakePost={fakePost} handlePostClick={handlePostClick} />
+        <PostStatistics post={post} handlePostClick={handlePostClick} />
       </div>
 
       {/* Post Action Buttons Section */}

@@ -22,13 +22,15 @@ export default function EditPostPage () {
     mutationFn: (id) => postDetails(id),
     onSuccess: (data) => {
       setLoading(true);
-      setBody(data.data.post.body);
-      setOriginalBody(data.data.post.body);
-      setImagePreview(data.data.post.image);
-      setOriginalImage(data.data.post.image);
+      setBody(data.data.data.post.body);
+      setOriginalBody(data.data.data.post.body);
+      setImagePreview(data.data.data.post.image);
+      setOriginalImage(data.data.data.post.image);
     },
     onError: (error) => {
       console.error("Error fetching post details:", error);
+      toast.error("Failed to load the post");
+      navigator('/');
     },
   });
 

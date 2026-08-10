@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const BASE_URL = "https://linked-posts.routemisr.com/users/";
+const BASE_URL = "https://route-posts.routemisr.com/";
+
 export const registerUser = (userData) => {
-  return axios.post(`${BASE_URL}signup`, userData);
+  return axios.post(`${BASE_URL}users/signup`, userData);
 }
 
 export const loginUser = (userData) => {
-  return axios.post(`${BASE_URL}signin`, userData);
+  return axios.post(`${BASE_URL}users/signin`, userData);
 }

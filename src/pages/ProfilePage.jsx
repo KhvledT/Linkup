@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getUserDetails } from "../Services/UserDetailsServices";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,6 @@ import SettingsModal from "../components/SettingsModal";
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 import UserPosts from "../components/UserPosts.jsx";
 import { AuthContext } from "../Contexts/AuthContext.jsx";
-import { queryClient } from "../App.jsx";
 
 export default function ProfilePage() {
   const { themeColors } = useTheme();
@@ -19,7 +18,7 @@ export default function ProfilePage() {
   const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isChangeProfilePictureModalOpen, setIsChangeProfilePictureModalOpen] = useState(false);
-  const { userID } = useContext(AuthContext);
+  const { userID, setUserID } = useContext(AuthContext);
   
 
   const { data, isLoading, refetch , isFetching, error, isError } = useQuery({
@@ -33,6 +32,14 @@ export default function ProfilePage() {
   });
 
   // Direct upload flow removed; handled inside ChangeProfilePictureModal
+
+  // Bootstrap userID from profile data so UserPosts works even on direct navigation
+  useEffect(() => {
+    if (!userID && data?.data?.data?.user?._id) {
+      setUserID(data.data.data.user._id);
+      localStorage.setItem('userID', data.data.data.user._id);
+    }
+  }, [userID, data, setUserID]);
 
   const handleProfilePictureClick = () => {
     setIsProfilePictureModalOpen(true);
@@ -78,7 +85,7 @@ export default function ProfilePage() {
            {/* Profile Image */}
            <div className="relative">
              <img
-               src={data?.data.user.photo}
+               src={data?.data?.data?.user?.photo}
                alt="Profile"
                className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 shadow-sm cursor-pointer hover:opacity-90 transition-opacity duration-200"
                style={{ borderColor: themeColors.primary }}
@@ -105,14 +112,14 @@ export default function ProfilePage() {
                style={{ color: themeColors.text }}
              >
                <i className="fas fa-user text-lg" style={{ color: themeColors.primary }}></i> 
-               {data?.data.user.name}
+               {data?.data?.data?.user?.name}
              </h1>
              <p 
                className="flex items-center justify-center sm:justify-start gap-2.5 text-sm"
                style={{ color: themeColors.textSecondary }}
              >
                <i className="fas fa-envelope text-sm" style={{ color: themeColors.primary }}></i> 
-               {data?.data.user.email}
+               {data?.data?.data?.user?.email}
              </p>
            </div>
          </div>
@@ -136,7 +143,7 @@ export default function ProfilePage() {
                  className="font-medium text-xs sm:text-sm"
                  style={{ color: themeColors.textSecondary }}
                >
-                 {data?.data.user.dateOfBirth.slice(0, 10)}
+                 {data?.data?.data?.user?.dateOfBirth?.slice(0, 10)}
                </span>
              </div>
            </div>
@@ -157,7 +164,7 @@ export default function ProfilePage() {
                  className="font-medium text-xs sm:text-sm capitalize"
                  style={{ color: themeColors.textSecondary }}
                >
-                 {data?.data.user.gender}
+                 {data?.data?.data?.user?.gender}
                </span>
              </div>
            </div>
@@ -182,8 +189,8 @@ export default function ProfilePage() {
       <ProfilePictureModal
         isOpen={isProfilePictureModalOpen}
         onClose={() => setIsProfilePictureModalOpen(false)}
-        imageUrl={data?.data.user.photo}
-        userName={data?.data.user.name}
+        imageUrl={data?.data?.data?.user?.photo}
+        userName={data?.data?.data?.user?.name}
       />
 
       {/* Settings Modal */}
@@ -196,7 +203,7 @@ export default function ProfilePage() {
       <ChangeProfilePictureModal 
         isOpen={isChangeProfilePictureModalOpen}
         onClose={() => setIsChangeProfilePictureModalOpen(false)}
-        currentImageUrl={data?.data.user.photo}
+        currentImageUrl={data?.data?.data?.user?.photo}
       />
 
       {/* User Posts */}

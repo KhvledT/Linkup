@@ -7,6 +7,12 @@ export const registerSchema = zod
       .min(3, 'Name must be at least 3 characters')
       .max(20, 'Name must be at most 20 characters'),
 
+    username: zod.string()
+      .nonempty('Username is required')
+      .min(3, 'Username must be at least 3 characters')
+      .max(20, 'Username must be at most 20 characters')
+      .regex(/^[a-zA-Z0-9._]+$/, 'Username can only contain letters, numbers, dot and underscore'),
+
     email: zod.string()
       .nonempty('Email is required')
       .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Invalid email format'),

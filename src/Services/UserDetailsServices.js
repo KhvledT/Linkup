@@ -1,35 +1,28 @@
 import axios from "axios";
-const BASE_URL = "https://linked-posts.routemisr.com/";
+import { getAuthHeaders } from "./authHeaders.js";
+const BASE_URL = "https://route-posts.routemisr.com/";
 
 export const getUserDetails = () => {
   return axios.get(`${BASE_URL}users/profile-data`, {
-      headers: {
-        token: localStorage.getItem("token"),
-      },
-    })
-}
+    headers: getAuthHeaders(),
+  });
+};
+
 export const UploadUserImage = (data) => {
-  return axios.put(`${BASE_URL}users/upload-photo`,data, {
-      headers: {
-        token: localStorage.getItem("token"),
-        "Content-Type": "multipart/form-data",
-      },
-    })
-}
+  return axios.put(`${BASE_URL}users/upload-photo`, data, {
+    headers: getAuthHeaders(),
+  });
+};
 
 export const getUserPosts = (id) => {
   return axios.get(`${BASE_URL}users/${id}/posts?limit=50`, {
-      headers: {
-        token: localStorage.getItem("token"),
-      },
-    })
-}
+    headers: getAuthHeaders(),
+  });
+};
 
 export const changeUserPassword = (body) => {
-  return axios.patch(`${BASE_URL}users/change-password`,body, {
-      headers: {
-        token: localStorage.getItem("token"),
-      },
-    })
-}
+  return axios.patch(`${BASE_URL}users/change-password`, body, {
+    headers: getAuthHeaders(),
+  });
+};
 

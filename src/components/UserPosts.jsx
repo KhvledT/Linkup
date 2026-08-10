@@ -6,9 +6,10 @@ import { getUserPosts } from '../Services/UserDetailsServices'
 
 export default function UserPosts({userID}) {
 
-    const { data, isLoading, refetch, isFetching ,error ,isError } = useQuery({
-        queryKey: ['userPosts'],
+    const { data, isLoading, refetch, isError } = useQuery({
+        queryKey: ['userPosts', userID],
         queryFn: () => getUserPosts(userID),
+        enabled: !!userID,
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
         refetchOnMount: true,
@@ -23,8 +24,8 @@ export default function UserPosts({userID}) {
         ) : isError ? (
           ''
         ) : (
-          [...(data.data.posts || [])].reverse().map((post) => (
-            <div className='mb-4' key={post.id}>
+          [...(data.data.data.posts || [])].reverse().map((post) => (
+            <div className='mb-4' key={post._id}>
                 <Post
                     post={post}
                     getUserPosts={refetch}

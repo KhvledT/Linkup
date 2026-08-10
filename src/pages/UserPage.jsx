@@ -20,7 +20,7 @@ export default function UserPage() {
     refetchOnWindowFocus: false,
   });
 
-  const user = data?.data?.post?.user;
+  const user = data?.data?.data?.post?.user;
 
   const handlePreviewImage = () => setPreviewImage(true);
 

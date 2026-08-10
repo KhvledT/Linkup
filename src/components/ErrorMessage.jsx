@@ -11,7 +11,7 @@ export default function ErrorMessage({error , refetch}) {
           className='text-3xl'
           style={{ color: themeColors.primary }}
         >
-          {error.message}
+          {error?.response?.data?.message || error?.message}
         </h1>
         <Button 
           onPress={refetch}

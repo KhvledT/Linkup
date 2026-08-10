@@ -12,6 +12,7 @@ import { loginSchema } from '../schema/LoginSchama';
 
 // Import authentication service for API calls
 import { loginUser } from "../Services/AuthService";
+import { isValidJwt } from "../Services/authHeaders.js";
 
 // Import React hooks for context and state management
 import { useContext, useState } from 'react';
@@ -56,8 +57,17 @@ export default function LoginPage() {
   const { mutate: handleloginUser, isPending, isError } = useMutation({
     mutationFn: (data) => loginUser(data),
     onSuccess: (data) => {
-      // Store authentication token in localStorage
-      localStorage.setItem('token', data.data.token);
+      // Store the authentication token in localStorage — only if the API actually returned
+      // a well-formed JWT. The API envelope is { success, message, data: { token, user } },
+      // so the token lives at response.data.data.token (axios response -> body -> body.data).
+      const token = data?.data?.data?.token;
+      if (!isValidJwt(token)) {
+        setLoginErrorMessage('Login response did not include a valid token. Please try again.');
+        setIsloggedIn(false);
+        localStorage.removeItem('token');
+        return;
+      }
+      localStorage.setItem('token', token);
       // Update global authentication state
       setIsloggedIn(true);
       // Navigate to home page after successful login
@@ -246,8 +256,9 @@ export default function LoginPage() {
                 </Button>
 
                 {/* Error message display */}
-                {/* Shows when login credentials are incorrect */}
-                {isError && (
+                {/* Shows when login credentials are incorrect OR when the API response
+                    was missing a valid token (mutation succeeded but auth could not continue) */}
+                {(isError || loginErrorMessage) && (
                   <div 
                     className="p-4 rounded-xl text-center font-semibold text-lg border-2"
                     style={{ 
@@ -256,7 +267,7 @@ export default function LoginPage() {
                       color: themeColors.primary
                     }}
                   >
-                    Email or password is incorrect, please try again.
+                    {loginErrorMessage || 'Email or password is incorrect, please try again.'}
                   </div>
                 )}
 

@@ -20,6 +20,7 @@ export default function RegisterPage() {
   const { handleSubmit, register, formState: { errors }, watch } = useForm({
     defaultValues: {
       name: '',
+      username: '',
       email: '',
       password: '',
       rePassword: '',
@@ -33,14 +34,14 @@ export default function RegisterPage() {
 
   const {mutate : handleRegister, isPending  } = useMutation({
     mutationFn: (data) => registerUser(data),
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success('Account created successfully!', { duration: 7000 });
       setTimeout(() => {
         navigator('/login');
       }, 2000);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.error || 'Registration failed', { duration: 7000 });
+      toast.error(error?.response?.data?.message || 'Registration failed', { duration: 7000 });
       setIsloggedIn(false);
       localStorage.removeItem('token');
     }
@@ -118,6 +119,27 @@ export default function RegisterPage() {
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit(handleRegister)} className="space-y-6">
+            <div className="relative">
+              <Input
+                size="lg"
+                isInvalid={Boolean(errors.username?.message)}
+                errorMessage={errors.username?.message}
+                label="Username"
+                type="text"
+                classNames={{
+                  input: "custom-input",
+                  inputWrapper: `custom-input-wrapper ${Boolean(errors.username?.message) ? 'is-invalid' : ''}`,
+                  label: "text-gray-300",
+                  errorMessage: "text-red-500"
+                }}
+                {...register('username')}
+              />
+              <div
+                className="absolute top-3 right-3 w-2 h-2 rounded-full opacity-60"
+                style={{ backgroundColor: themeColors.primary }}
+              ></div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="relative">
                 <Input
