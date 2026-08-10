@@ -125,7 +125,8 @@ Scripts: `npm run dev` (vite), `npm run build` (vite build), `npm run lint` (esl
 ```
 https://route-posts.routemisr.com/
 ```
-(The README's `https://linked-posts.routemisr.com/` is stale — the live host is `route-posts.routemisr.com`.)
+(The README's `https://linked-posts.routemisr.com/` was corrected to `route-posts.routemisr.com`
+during Vercel deployment prep.)
 
 ### Success envelope
 Every 2xx response has the shape:
@@ -744,9 +745,9 @@ Test fixture: account `linkuptest0810` / `linkuptest0810@gmail.com` (password no
 
 ## 5.5 Documentation staleness notes
 
-- `README.md`: base URL `https://linked-posts.routemisr.com/` is stale (live host is
-  `route-posts.routemisr.com`); claims 5 color themes, nested comments, real likes/shares —
-  aspirational/not in the code.
+- `README.md`: base URL was corrected to `route-posts.routemisr.com` (previously the stale
+  `linked-posts.routemisr.com`) during Vercel prep; still claims 5 color themes, nested comments,
+  real likes/shares — aspirational/not in the code.
 - `ARCHITECTURE.md` §39 used to flag API-contract drift from early probes (only `GET /signin`
   404s and 401s). It was **reconciled with the live-verified contract in this session** (§5.8):
   §12–§16, §18, §20–§22, §28–§33, §36, §38–§40 and Appendix A now describe the post-fix tree.

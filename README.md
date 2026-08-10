@@ -133,11 +133,34 @@ src/
 
 ### Environment Variables
 The application uses the following API configuration:
-- **Base URL**: `https://linked-posts.routemisr.com/`
+- **Base URL**: `https://route-posts.routemisr.com/`
 - **Authentication**: Token-based (stored in localStorage)
 
 ### Theme Configuration
 Themes can be customized in `src/Contexts/ThemeContext.jsx` by modifying the color schemes and adding new themes.
+
+## 🚀 Deployment (Vercel)
+
+The project is a **static Vite SPA** and deploys to Vercel as-is — no environment variables are
+required (the API base URL is hard-coded in `src/Services/*.js`).
+
+### Quick start (GitHub + Vercel)
+1. Push the repository to GitHub (`origin` is already `https://github.com/KhvledT/Linkup.git`).
+2. In Vercel: **Add New → Project → Import** the GitHub repo.
+3. Vercel auto-detects the **Vite** framework preset from `vercel.json`:
+   - Build command: `npm run build`
+   - Output directory: `dist`
+   - Node version: the `engines` field (`>=20.19.0`) is honored automatically
+4. Click **Deploy** — no other configuration needed.
+
+### Client-side routing
+Deep links (e.g. `/post-details/:id`, `/profile`, `/edit-post/:id`) are handled by the SPA
+rewrite in `vercel.json` (`/(.*) → /index.html`). The Netlify-style `public/_redirects`
+(`/* /index.html 200`) is kept for Netlify compatibility and is harmless on Vercel.
+
+### Local preview
+- `npm run dev` — development server
+- `npm run build && npm run preview` — production build served locally
 
 ## 🎯 Core Components Explained
 

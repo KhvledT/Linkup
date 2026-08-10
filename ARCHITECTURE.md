@@ -1325,9 +1325,9 @@ error state while the rest of the (stale) UI keeps rendering (§15).
   hard-coded in four service files: `https://route-posts.routemisr.com/`
   (`AuthService.js:3`, `FeedServices.js:2`, `CommentServices.js:2`,
   `UserDetailsServices.js:2`).
-- **README vs code conflict:** the README documents the base URL as
-  `https://linked-posts.routemisr.com/` (`README.md:136`) — a *different* subdomain than the
-  code. The code's URL is authoritative (§39).
+- **README vs code conflict (resolved):** the README previously documented the base URL as
+  `https://linked-posts.routemisr.com/` (`README.md:136`); it now matches the code —
+  `https://route-posts.routemisr.com/`.
 - No runtime feature flags; behavior differences come only from `localStorage` values
   (`token`, `userID`, `darkMode`).
 - Vite config has no proxy; the browser calls the third-party API directly, so CORS must be
@@ -1337,18 +1337,15 @@ error state while the rest of the (stale) UI keeps rendering (§15).
 
 ## 35 · Deployment
 
-- **Static SPA**: `vite build` produces `dist/`. There is no CI/CD config, no
-  `netlify.toml`, no Dockerfile, no deployment scripts in the repo.
-- **`public/_redirects`** — Netlify-style SPA fallback:
-
-  ```
-  /*    /index.html   200
-  ```
-
-  This is what makes `createBrowserRouter` deep links (e.g. `/post-details/:id`) work on a
-  static host: any unknown path is served `index.html`. The file implies **Netlify** as the
-  intended host (a generic static host without this rule would 404 on deep links).
-- `README.md` describes deployment/general usage rather than any pinned pipeline.
+- **Static SPA**: `vite build` produces `dist/`. Deployment config is host-specific:
+  - **Vercel** (primary): `vercel.json` pins the Vite preset
+    (`framework: "vite"`, `buildCommand: "npm run build"`, `outputDirectory: "dist"`) and adds
+    the SPA fallback rewrite `{"source": "/(.*)", "destination": "/index.html"}` so
+    `createBrowserRouter` deep links (e.g. `/post-details/:id`) work on refresh.
+  - **Netlify**: `public/_redirects` (`/* /index.html 200`) provides the same fallback and is
+    kept for compatibility; harmless on Vercel.
+- `package.json` `engines.node` is `>=20.19.0` (Vite 7 requirement; Vercel honors it).
+- `README.md` has a "Deployment (Vercel)" section with import steps.
 
 ---
 
