@@ -79,7 +79,7 @@ export default function EditPostPage () {
 
   useEffect(() => {
     getPostDetails(id);
-  }, [id]);
+  }, [id, getPostDetails]);
 
   return (
     <>

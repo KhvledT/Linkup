@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import Post from '../components/Post';
@@ -6,15 +6,20 @@ import CreatePost from '../components/CreatePost';
 import LoadingPage from './LoadingPage';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import FetchingIcon from '../components/FetchingIcon';
-import { getAllPosts } from '../Services/FeedServices';
+import { getFeed, getAllPosts } from '../Services/FeedServices';
 import { getUserDetails } from '../Services/UserDetailsServices';
 import { AuthContext } from '../Contexts/AuthContext';
+import { useTheme } from '../Contexts/ThemeContext';
 
 export default function FeedPage() {
   const { setUserID } = useContext(AuthContext);
+  const { themeColors } = useTheme();
   const loadMoreRef = useRef(null);
   const location = useLocation();
+  const [feedMode, setFeedMode] = useState('exploring'); // following, all, me, exploring
+  const [hasImage, setHasImage] = useState(false);
 
+  // When feedMode === 'exploring', it will use the old /posts endpoint. Otherwise /posts/feed?only=
   const {
     data,
     isLoading,
@@ -26,8 +31,13 @@ export default function FeedPage() {
     error,
     refetch
   } = useInfiniteQuery({
-    queryKey: ['posts'],
-    queryFn: ({ pageParam = 1 }) => getAllPosts(pageParam),
+    queryKey: ['posts', feedMode, hasImage],
+    queryFn: ({ pageParam = 1 }) => {
+      if (feedMode === 'exploring') {
+        return getAllPosts(pageParam);
+      }
+      return getFeed({ only: feedMode, hasImage: hasImage ? true : undefined, page: pageParam });
+    },
     getNextPageParam: (lastPage, allPages) => {
       const posts = lastPage?.data?.data?.posts || [];
       return posts.length < 50 ? undefined : allPages.length + 1;
@@ -38,11 +48,9 @@ export default function FeedPage() {
     staleTime: 15000,
   });
 
-  // `data` is undefined until the first successful fetch and stays undefined when the API
-  // rejects (bad/expired token, network error). Never crash on `data.pages`.
   const pages = data?.pages ?? [];
 
-  async function getUserID() {
+  const getUserID = useCallback(async () => {
     if (localStorage.getItem('userID')) {
       setUserID(localStorage.getItem('userID'));
       return;
@@ -55,17 +63,14 @@ export default function FeedPage() {
         localStorage.setItem('userID', id);
       }
     } catch (err) {
-      // Non-fatal: the feed must still render if the profile bootstrap fails
-      // (e.g. transient token issue) — the error UI above covers the feed itself.
       console.error('Failed to bootstrap userID:', err);
     }
-  }
+  }, [setUserID]);
 
   useEffect(() => {
     getUserID();
-  }, []);
+  }, [getUserID]);
 
-  // Infinite scroll observer
   useEffect(() => {
     if (!loadMoreRef.current) return;
     const observer = new IntersectionObserver(
@@ -74,19 +79,30 @@ export default function FeedPage() {
           fetchNextPage();
         }
       },
-      { rootMargin: '10000px' }
+      { rootMargin: '2000px' }
     );
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [loadMoreRef, hasNextPage, fetchNextPage]);
   
-
-  // Refetch when location changes to FeedPage
   useEffect(() => {
     if (location.pathname === '/') {
       refetch();
     }
   }, [location.pathname, refetch]);
+
+  const TabButton = ({ value, label }) => (
+    <button
+      onClick={() => setFeedMode(value)}
+      className={`px-4 py-2 font-semibold transition-all duration-300 border-b-2`}
+      style={{
+        color: feedMode === value ? themeColors.primary : themeColors.textSecondary,
+        borderColor: feedMode === value ? themeColors.primary : 'transparent'
+      }}
+    >
+      {label}
+    </button>
+  );
 
   return (
     <div className="w-full">
@@ -94,8 +110,29 @@ export default function FeedPage() {
         <CreatePost />
       </div>
 
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-center bg-white p-2 rounded-xl border border-gray-100 shadow-sm" style={{ backgroundColor: themeColors.surface }}>
+        <div className="flex gap-2">
+          <TabButton value="following" label="Following" />
+          <TabButton value="all" label="All" />
+          <TabButton value="me" label="Me" />
+          <TabButton value="exploring" label="Explore" />
+        </div>
+        <div className="mt-4 sm:mt-0 px-2 flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            id="hasImageCheck" 
+            checked={hasImage}
+            onChange={(e) => setHasImage(e.target.checked)}
+            className="w-4 h-4 rounded"
+          />
+          <label htmlFor="hasImageCheck" className="text-sm font-medium" style={{ color: themeColors.textSecondary }}>
+            Image Only
+          </label>
+        </div>
+      </div>
+
       <div className="space-y-8">
-        {isFetching && !isLoading && <FetchingIcon />}
+        {isFetching && !isLoading && !isFetchingNextPage && <FetchingIcon />}
         {isLoading ? (
           <LoadingPage />
         ) : isError ? (

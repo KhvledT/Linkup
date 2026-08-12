@@ -6,22 +6,6 @@ export default function PostImageModal({ isOpen, onClose, imageUrl }) {
 
   if (!isOpen) return null;
 
-  const handleDownload = () => {
-    fetch(imageUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'post-image';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      })
-      .catch(err => console.error('Download failed:', err));
-  };
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300"
@@ -48,16 +32,6 @@ export default function PostImageModal({ isOpen, onClose, imageUrl }) {
             className="w-full max-h-[80vh] object-contain transition-transform duration-300"
           />
 
-          {/* Download Button Overlay */}
-          <button
-            onClick={handleDownload}
-            className="absolute bottom-4 right-4 px-6 py-2 rounded-lg font-semibold text-white shadow-lg transition-all duration-300"
-            style={{
-              background: `linear-gradient(90deg, ${themeColors.primary}, ${themeColors.secondary})`,
-            }}
-          >
-            Download
-          </button>
         </div>
       </div>
     </div>

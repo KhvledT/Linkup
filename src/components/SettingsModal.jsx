@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
 import ChangePasswordModal from './ChangePasswordModal.jsx';
+import NotificationsModal from './NotificationsModal.jsx';
 
 export default function SettingsModal({ isOpen, onClose }) {
   const { themeColors, isDarkMode, toggleDarkMode } = useTheme();
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -150,35 +152,41 @@ export default function SettingsModal({ isOpen, onClose }) {
               </div>
             </div>
 
-            {/* Additional Settings (Placeholder) */}
+            {/* Notifications */}
             <div 
-              className="p-4 rounded-xl border border-gray-100 opacity-50"
+              className="p-4 rounded-xl border border-gray-100 hover:border-gray-200 transition-all duration-300 cursor-pointer"
               style={{ 
-                backgroundColor: `${themeColors.primary}02`,
-                borderColor: isDarkMode ? themeColors.primary + '20' : undefined
+                backgroundColor: `${themeColors.primary}03`,
+                borderColor: isDarkMode ? themeColors.primary + '30' : undefined
               }}
+              onClick={() => setIsNotificationsOpen(true)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-300"
+                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: themeColors.primary }}
                   >
-                    <i className="fas fa-bell text-gray-500"></i>
+                    <i className="fas fa-bell text-white"></i>
                   </div>
                   <div>
                     <h3 
-                      className="font-semibold text-sm text-gray-500"
+                      className="font-semibold text-sm"
+                      style={{ color: themeColors.text }}
                     >
                       Notifications
                     </h3>
-                    <p className="text-xs text-gray-400">
-                      Manage notification preferences
+                    <p className="text-xs" style={{ color: themeColors.textSecondary }}>
+                      View incoming activities
                     </p>
                   </div>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-gray-300 text-gray-500">
-                  Soon
-                </span>
+                <div className="flex items-center gap-2">
+                  <i 
+                    className="fas fa-chevron-right text-sm"
+                    style={{ color: themeColors.textSecondary }}
+                  ></i>
+                </div>
               </div>
             </div>
           </div>
@@ -199,6 +207,11 @@ export default function SettingsModal({ isOpen, onClose }) {
       <ChangePasswordModal
         isOpen={isChangePasswordModalOpen}
         onClose={() => setIsChangePasswordModalOpen(false)}
+      />
+
+      <NotificationsModal 
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
       />
     </div>
   );

@@ -170,6 +170,34 @@ export default function Post({
         </>
       )}
 
+      {/* Shared Post Section */}
+      {post?.sharedPost && (
+        <div 
+          className="m-3 sm:m-4 p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
+          style={{ borderColor: themeColors.primary + '30' }}
+          onClick={(e) => {
+             e.stopPropagation();
+             navigator(`/post-details/${post.sharedPost._id}`);
+          }}
+        >
+          <PostHeader 
+             post={post.sharedPost}
+             fakePost={fakePost}
+             userID={null} 
+             handleEditPost={() => {}}
+             handleDeletePost={() => {}}
+          />
+          {post.sharedPost.body && (
+            <p className="mt-2 text-sm sm:text-base leading-relaxed" style={{ color: themeColors.text }}>
+              {post.sharedPost.body}
+            </p>
+          )}
+          {post.sharedPost.image && (
+             <img src={post.sharedPost.image} className="mt-3 w-full max-h-64 object-cover rounded-lg" alt="shared content" />
+          )}
+        </div>
+      )}
+
       {/* Post Statistics Section */}
       {/* Displays post metrics like likes, comments, and shares */}
       <div

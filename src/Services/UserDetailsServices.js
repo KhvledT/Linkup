@@ -14,6 +14,12 @@ export const UploadUserImage = (data) => {
   });
 };
 
+export const UploadUserCover = (data) => {
+  return axios.put(`${BASE_URL}users/upload-cover`, data, {
+    headers: getAuthHeaders(),
+  });
+};
+
 export const getUserPosts = (id) => {
   return axios.get(`${BASE_URL}users/${id}/posts?limit=50`, {
     headers: getAuthHeaders(),

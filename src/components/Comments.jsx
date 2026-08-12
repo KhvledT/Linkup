@@ -5,6 +5,7 @@ import { AuthContext } from '../Contexts/AuthContext';
 import { deleteComment, updateComment, getPostComments } from '../Services/CommentServices';
 import CommentHeader from './CommentHeader';
 import CommentEditBox from './CommentEditBox';
+import CommentItem from './CommentItem';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useTheme } from '../Contexts/ThemeContext.jsx';
@@ -13,7 +14,7 @@ import DeleteCommentConfirmModal from './DeleteCommentConfirmModal.jsx';
 
 export default function Comments({ post, commentLimit }) {
   const { themeColors } = useTheme();
-  const { userID } = useContext(AuthContext);
+  useContext(AuthContext);
   const [editComment, setEditComment] = useState(null); 
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,11 +74,6 @@ export default function Comments({ post, commentLimit }) {
     },
   });
 
-  function editCommentPreview(commentId, content) {
-    setCommentText(content);
-    setEditComment((prev) => (prev === commentId ? null : commentId));
-  }
-
   return (
     <>
       {comments.length > 0 && (
@@ -96,33 +92,19 @@ export default function Comments({ post, commentLimit }) {
             .slice(0, commentLimit)
             .reverse()
             .map((comment) => (
-              <div key={comment._id} className="mb-4 pb-3 border-b last:border-b-0" style={{ borderColor: themeColors.primary + '10' }}>
-                <div className="flex items-start justify-between space-x-3 rtl:space-x-reverse">
-                  <CommentHeader comment={comment} fakeCommentPhoto={fakeCommentPhoto} />
-
-                  {comment.commentCreator._id === userID && (
-                    <DropDown
-                      commentId={comment._id}
-                      handleDeleteComment={openDeleteConfirm}
-                      editCommentPreview={() => editCommentPreview(comment._id, comment.content)}
-                      Type="comment"
-                    />
-                  )}
-                </div>
-
-                {editComment === comment._id && (
-                  <CommentEditBox
-                    comment={comment}
-                    setEditComment={setEditComment}
-                    commentText={commentText}
-                    setCommentText={setCommentText}
-                    isSubmitting={isSubmitting}
-                    handleEditComment={() =>
-                      handleEditComment({ commentId: comment._id, content: commentText })
-                    }
-                  />
-                )}
-              </div>
+              <CommentItem
+                key={comment._id}
+                comment={comment}
+                post={post}
+                fakeCommentPhoto={fakeCommentPhoto}
+                openDeleteConfirm={openDeleteConfirm}
+                editComment={editComment}
+                setEditComment={setEditComment}
+                commentText={commentText}
+                setCommentText={setCommentText}
+                isSubmitting={isSubmitting}
+                handleEditComment={handleEditComment}
+              />
             ))}
         </div>
       )}

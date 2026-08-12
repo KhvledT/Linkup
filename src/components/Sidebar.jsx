@@ -1,65 +1,117 @@
-import React from 'react';
-import { useTheme } from '../Contexts/ThemeContext.jsx';
+import React, { useContext, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTheme } from "../Contexts/ThemeContext.jsx";
+import { AuthContext } from "../Contexts/AuthContext.jsx";
+import {
+  getUserSuggestions,
+  toggleFollow,
+  getUserProfile,
+} from "../Services/FollowServices.js";
+import { getUserDetails } from "../Services/UserDetailsServices.js";
 import fakeProfilePhoto from "../../public/FakeProfileImage.png";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-export default function Sidebar({ position = 'left' }) {
+export default function Sidebar({ position = "left" }) {
   const { themeColors } = useTheme();
+  const navigate = useNavigate();
+  const { isloggedIn, userID } = useContext(AuthContext);
+  const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState("");
 
-  // Fake data
-  const fakeStories = [
-    { id: 1, title: "Create Story", icon: "fas fa-plus", bgColor: themeColors.primary },
-    { id: 2, title: "Friends", icon: "fas fa-users", bgColor: themeColors.secondary },
-    { id: 3, title: "Saved", icon: "fas fa-bookmark", bgColor: themeColors.primary }
-  ];
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  const fakeOnlineFriends = [
-    { id: 1, name: "Sara Ahmed" },
-    { id: 2, name: "Omar Ali" },
-    { id: 3, name: "Laila Hassan" }
-  ];
+  const { data: suggestionsData, isLoading, isFetching } = useQuery({
+    queryKey: ["suggestions", debouncedSearchTerm],
+    queryFn: () => getUserSuggestions(1, 50, debouncedSearchTerm),
+    enabled: isloggedIn,
+  });
 
-  const fakeTrending = [
-    { topic: "Technology", posts: "2.5K posts" },
-    { topic: "Design", posts: "1.8K posts" },
-    { topic: "Development", posts: "3.2K posts" },
-    { topic: "Innovation", posts: "1.1K posts" }
-  ];
+  const { data: myProfileData } = useQuery({
+    queryKey: ["userProfile", userID],
+    queryFn: () => getUserProfile(userID),
+    enabled: isloggedIn && !!userID && (position === "right" || position === "mobile"),
+  });
 
-  const fakeSuggestedFriends = [
-    { id: 1, name: "Mohamed Samir", mutual: 5 },
-    { id: 2, name: "Hana Adel", mutual: 12 },
-    { id: 3, name: "Youssef Nabil", mutual: 8 }
+  const myFriends = myProfileData?.data?.data?.user?.following || myProfileData?.data?.user?.following || [];
+
+  const { mutate: handleFollow } = useMutation({
+    mutationFn: (userId) => toggleFollow(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["suggestions"]);
+      queryClient.invalidateQueries(["userDetails"]);
+      queryClient.invalidateQueries(["userProfile"]);
+      queryClient.invalidateQueries(["posts"]);
+      toast.success("Follow status updated");
+    },
+    onError: () => {
+      toast.error("Failed to update follow status");
+    },
+  });
+
+  const suggestions =
+    suggestionsData?.data?.data?.users ||
+    suggestionsData?.data?.data?.suggestions ||
+    [];
+
+  const isSyncingSearch = searchTerm !== debouncedSearchTerm;
+
+  const filteredSuggestions = searchTerm.trim()
+    ? (isSyncingSearch 
+        ? suggestions.filter((u) => 
+            u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        : suggestions)
+    : suggestions.slice(0, 5);
+
+  const quickLinks = [
+    {
+      id: 1,
+      title: "My Profile",
+      icon: "fas fa-user-circle",
+      bgColor: themeColors.primary,
+      path: "/profile",
+    },
+    {
+      id: 2,
+      title: "Bookmarks",
+      icon: "fas fa-bookmark",
+      bgColor: themeColors.secondary,
+      path: "/bookmarks",
+    },
   ];
 
   const leftSidebarContent = (
-    <div 
-      className="sticky top-24 rounded-2xl p-4 lg:p-6 shadow-lg bg-white border border-gray-200"
-    >
-      <h3 
-        className="text-xl font-bold mb-6"
+    <div className={`rounded-2xl p-4 lg:p-6 shadow-lg bg-white border border-gray-200 ${position !== 'mobile' ? 'sticky top-24' : ''}`}>
+      <h3
+        className="text-base lg:text-xl font-bold mb-6"
         style={{ color: themeColors.primary }}
       >
         Quick Actions
       </h3>
-      
-      {/* Stories Section */}
       <div className="space-y-4 mb-8">
-        {fakeStories.map((story) => (
-          <div 
+        {quickLinks.map((story) => (
+          <div
+            onClick={() => story.path && navigate(story.path)}
             key={story.id}
             className="flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover-theme-light"
-            style={{ 
-              backgroundColor: themeColors.primary + '02'
-            }}
+            style={{ backgroundColor: themeColors.primary + "02" }}
           >
-            <div 
-              className="w-12 h-12 rounded-full flex items-center justify-center"
+            <div
+              className="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center"
               style={{ backgroundColor: story.bgColor }}
             >
-              <i className={`${story.icon} text-white text-lg`}></i>
+              <i className={`${story.icon} text-white text-base lg:text-lg`}></i>
             </div>
-            <span 
-              className="font-semibold text-lg"
+            <span
+              className="font-semibold text-sm lg:text-lg"
               style={{ color: themeColors.text }}
             >
               {story.title}
@@ -67,137 +119,225 @@ export default function Sidebar({ position = 'left' }) {
           </div>
         ))}
       </div>
-      
-      {/* Online Friends */}
+
+      {/* Search People */}
       <div>
-        <h4 
-          className="text-lg font-bold mb-4"
+        <h4
+          className="text-base lg:text-lg font-bold mb-4"
           style={{ color: themeColors.primary }}
         >
-          Online Friends
+          Search People
         </h4>
-        <div className="space-y-3">
-          {fakeOnlineFriends.map((friend) => (
-            <div key={friend.id} className="flex items-center gap-4">
-              <div className="relative">
-                <img 
-                  src={fakeProfilePhoto} 
-                  alt={friend.name} 
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div 
-                  className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2"
-                  style={{ 
-                    backgroundColor: '#10B981',
-                    borderColor: 'white'
-                  }}
-                ></div>
-              </div>
-              <span 
-                className="font-medium"
-                style={{ color: themeColors.text }}
+        <input
+          type="text"
+          placeholder="Search by name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-2 mb-4 rounded-xl outline-none"
+          style={{
+            backgroundColor: themeColors.primary + "10",
+            color: themeColors.text,
+          }}
+        />
+        <div className="space-y-3 max-h-60 overflow-y-auto">
+          {searchTerm.trim() &&
+            filteredSuggestions.map((friend) => (
+              <div
+                key={friend._id}
+                className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 p-2 rounded-xl"
+                onClick={() => navigate(`/user/${friend._id}`)}
               >
-                {friend.name}
-              </span>
-            </div>
-          ))}
+                <div className="relative">
+                  <img
+                    src={friend.photo || fakeProfilePhoto}
+                    alt={friend.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                </div>
+                <span
+                  className="font-medium truncate max-w-[120px]"
+                  style={{ color: themeColors.text }}
+                >
+                  {friend.name}
+                </span>
+              </div>
+            ))}
+          {(isFetching || isSyncingSearch) && searchTerm.trim() && (
+            <p
+              className="text-sm text-center"
+              style={{ color: themeColors.textSecondary }}
+            >
+              Searching...
+            </p>
+          )}
+          {searchTerm.trim() && filteredSuggestions.length === 0 && !isFetching && !isSyncingSearch && (
+            <p
+              className="text-sm text-center"
+              style={{ color: themeColors.textSecondary }}
+            >
+              No match found.
+            </p>
+          )}
         </div>
       </div>
     </div>
   );
 
   const rightSidebarContent = (
-    <div 
-      className="sticky top-24 rounded-2xl p-4 lg:p-6 shadow-lg border"
-      style={{ 
-        backgroundColor: themeColors.surface,
-        borderColor: themeColors.primary + '20'
-      }}
-    >
-      <h3 
-        className="text-xl font-bold mb-6"
-        style={{ color: themeColors.primary }}
+    <div className={`space-y-6 ${position !== 'mobile' ? 'sticky top-24' : ''}`}>
+      <div
+        className="rounded-2xl p-4 lg:p-6 shadow-lg border"
+        style={{
+          backgroundColor: themeColors.surface,
+          borderColor: themeColors.primary + "20",
+        }}
       >
-        Trending
-      </h3>
-      
-      {/* Trending Topics */}
-      <div className="space-y-4 mb-8">
-        {fakeTrending.map((item, index) => (
-          <div 
-            key={index}
-            className="p-4 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover-theme-light"
-            style={{ 
-              backgroundColor: themeColors.primary + '02'
-            }}
-          >
-            <h4 
-              className="font-bold text-lg"
+        {isloggedIn && (
+          <div>
+            <h4
+              className="text-base lg:text-lg font-bold mb-4"
               style={{ color: themeColors.primary }}
             >
-              #{item.topic}
+              Suggested Friends
             </h4>
-            <p 
-              className="font-medium"
+            {isLoading ? (
+              <p
+                className="text-sm"
+                style={{ color: themeColors.textSecondary }}
+              >
+                Loading suggestions...
+              </p>
+            ) : suggestions.length === 0 ? (
+              <p
+                className="text-sm"
+                style={{ color: themeColors.textSecondary }}
+              >
+                No suggestions available.
+              </p>
+            ) : (
+              <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2">
+                {filteredSuggestions.map((friend) => (
+                  <div
+                    key={friend._id}
+                    className="flex items-center justify-between"
+                  >
+                    <div
+                      className="flex items-center gap-3 cursor-pointer"
+                      onClick={() => {
+                        if (friend._id === userID) {
+                          navigate("/profile");
+                        } else {
+                          navigate(`/user/${friend._id}`);
+                        }
+                      }}
+                    >
+                      <img
+                        src={friend.photo || fakeProfilePhoto}
+                        alt={friend.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                      <div>
+                        <p
+                          className="font-semibold text-sm max-w-[120px] truncate hover:underline"
+                          title={friend.name}
+                          style={{ color: themeColors.text }}
+                        >
+                          {friend.name}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleFollow(friend._id)}
+                      className="px-3 py-1.5 text-sm rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+                      style={{
+                        backgroundColor: themeColors.primary,
+                        color: "white",
+                      }}
+                    >
+                      Follow
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {isloggedIn && (
+        <div
+          className="rounded-2xl p-4 lg:p-6 shadow-lg border"
+          style={{
+            backgroundColor: themeColors.surface,
+            borderColor: themeColors.primary + "20",
+          }}
+        >
+          <h4
+            className="text-base lg:text-lg font-bold mb-4"
+            style={{ color: themeColors.primary }}
+          >
+            Friends
+          </h4>
+          {!myFriends || myFriends.length === 0 ? (
+            <p
+              className="text-sm text-center py-2"
               style={{ color: themeColors.textSecondary }}
             >
-              {item.posts}
+              You aren't following anyone.
             </p>
-          </div>
-        ))}
-      </div>
-      
-      {/* Suggested Friends */}
-      <div>
-        <h4 
-          className="text-lg font-bold mb-4"
-          style={{ color: themeColors.primary }}
-        >
-          Suggested Friends
-        </h4>
-        <div className="space-y-4">
-          {fakeSuggestedFriends.map((friend) => (
-            <div key={friend.id} className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <img 
-                  src={fakeProfilePhoto} 
-                  alt={friend.name} 
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <p 
-                    className="font-semibold"
-                    style={{ color: themeColors.text }}
+          ) : (
+            <div className="space-y-4 max-h-[30vh] overflow-y-auto pr-2">
+              {myFriends.map((friend) => (
+                <div
+                  key={friend._id || Math.random()}
+                  className="flex items-center justify-between"
+                >
+                  <div
+                    className="flex items-center gap-3 cursor-pointer"
+                    onClick={() => {
+                      const fId = friend._id || friend;
+                      if (fId === userID) {
+                        navigate("/profile");
+                      } else {
+                        navigate(`/user/${fId}`);
+                      }
+                    }}
                   >
-                    {friend.name}
-                  </p>
-                  <p 
-                    className="text-sm"
-                    style={{ color: themeColors.textSecondary }}
-                  >
-                    {friend.mutual} mutual friends
-                  </p>
+                    <img
+                      src={friend.photo || fakeProfilePhoto}
+                      alt={friend.name || "User"}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div>
+                      <p
+                        className="font-semibold text-sm max-w-[150px] truncate hover:underline"
+                        title={friend.name || "Unknown"}
+                        style={{ color: themeColors.text }}
+                      >
+                        {friend.name || "Unknown"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <button 
-                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
-                style={{ 
-                  backgroundColor: themeColors.primary,
-                  color: "white"
-                }}
-              >
-                Add
-              </button>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
+  if (position === "mobile") {
+    return (
+      <div className="flex flex-col gap-6 w-full pb-8">
+        {leftSidebarContent}
+        {rightSidebarContent}
+      </div>
+    );
+  }
 
   return (
     <div className="lg:col-span-3 xl:col-span-3 hidden lg:block">
-      {position === 'left' ? leftSidebarContent : rightSidebarContent}
+      {position === "left" ? leftSidebarContent : rightSidebarContent}
     </div>
   );
 }

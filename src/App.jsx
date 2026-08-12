@@ -13,6 +13,7 @@ import ProfilePage from './pages/ProfilePage'
 import NotFoundPage from './pages/NotFoundPage'
 import EditPostPage from './pages/EditPostPage'
 import UserPage from './pages/UserPage'
+import BookmarksPage from './pages/BookmarksPage'
 
 import ProtactedRoute from './ProtectedRoutes/ProtactedRoute'
 import ProtectedAuthRoute from './ProtectedRoutes/ProtectedAuthRoute'
@@ -43,8 +44,11 @@ const router = createBrowserRouter([
       {index: true, element: <ProtactedRoute><FeedPage/></ProtactedRoute>},
       {path: `post-details/:id`, element: <ProtactedRoute><PostDetailsPage/></ProtactedRoute>},
       {path: `profile`, element: <ProtactedRoute><ProfilePage/></ProtactedRoute>},
+      {path: `profile/:id`, element: <ProtactedRoute><ProfilePage/></ProtactedRoute>},
       {path: `edit-post/:id`, element: <ProtactedRoute><EditPostPage/></ProtactedRoute>},
+      {path: `user/:id`, element: <ProtactedRoute><UserPage/></ProtactedRoute>},
       {path: `user-page/:id`, element: <ProtactedRoute><UserPage/></ProtactedRoute>},
+      {path: `bookmarks`, element: <ProtactedRoute><BookmarksPage/></ProtactedRoute>},
       {path: `*`, element: <NotFoundPage/>},
     ]
   }

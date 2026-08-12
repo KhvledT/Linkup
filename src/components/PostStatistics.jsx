@@ -15,28 +15,28 @@ export default function PostStatistics({ post, handlePostClick }) {
             className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs"
             style={{ backgroundColor: themeColors.primary }}
           >
-            👍
+            <i className="fas fa-thumbs-up text-white text-xs"></i>
           </div>
-          <span 
+          <span
             className="text-xs sm:text-sm font-medium"
             style={{ color: themeColors.textSecondary }}
           >
-            {post?.likesCount ?? 0}
+            {post?.likes?.length ?? post?.likesCount ?? 0}
           </span>
         </div>
-        
-        <span 
+
+        <span
           className="text-xs sm:text-sm font-medium"
           style={{ color: themeColors.textSecondary }}
         >
-          {post?.commentsCount ?? 0} Comments
+          {post?.comments?.length ?? post?.commentsCount ?? 0} Comments
         </span>
-        
-        <span 
+
+        <span
           className="text-xs sm:text-sm font-medium"
           style={{ color: themeColors.textSecondary }}
         >
-          {post?.sharesCount ?? 0} Shares
+          {post?.shares?.length ?? post?.sharesCount ?? 0} Shares
         </span>
       </div>
     </div>

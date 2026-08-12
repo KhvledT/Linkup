@@ -10,7 +10,7 @@ export default function PostHeader({post , fakePost , userID , handleEditPost , 
     if(post?.user?._id === userID) {
       navigate(`/profile`);
     } else {
-      navigate(`/user-page/${post?._id}`);
+      navigate(`/user-page/${post?.user?._id}`);
     }
   }
 
